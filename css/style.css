@@ -656,9 +656,9 @@ font.douyin {
   z-index: -1;
 }
 #nexmoe-background .nexmoe-bg {
-  opacity: 0.2;
+  opacity: 1;
   background-size: cover;
-  filter: blur(30px);
+  filter: blur(0px);
   height: 100vh;
   width: 100%;
   position: fixed;
@@ -1255,6 +1255,7 @@ body {
 .xiaoshu #nexmoe-content {
   width: 100%;
   padding: var(--gutter);
+  opacity: 0.5;
   margin: 0;
   background: var(--color-card);
   box-shadow: 0 0 1rem var(--color-shadow);
