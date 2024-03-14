@@ -1387,9 +1387,8 @@ body {
   margin-bottom: 10px;
   text-align: center;
   opacity: 1;
-  transition: opacity 8s ease;
-  background: #fff;
   transition: opacity 0.8s ease, color 0.8 ease, background 0.8s ease;
+  background: #fff;
 }
 
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item:hover {
