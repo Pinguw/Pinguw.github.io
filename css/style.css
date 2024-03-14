@@ -1386,7 +1386,12 @@ body {
   border-radius: var(--radius);
   margin-bottom: 10px;
   text-align: center;
-  transition: fade !important;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item:hover {
+  opacity: 0.5;
 }
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true,
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true i {
