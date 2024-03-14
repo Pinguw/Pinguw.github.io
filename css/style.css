@@ -1389,11 +1389,12 @@ body {
   opacity: 1;
   transition: opacity 8s ease;
   background: #fff;
-  transition: opacity 0.8s ease, background 8s ease;
+  transition: opacity 0.8s ease, background 0.8s ease;
 }
 
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item:hover {
   opacity: 0.6;
+  color: 0xfff;
   background-color: #9034ce;
 }
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true,
