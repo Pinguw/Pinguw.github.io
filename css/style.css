@@ -1394,7 +1394,7 @@ body {
 
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item:hover {
   opacity: 0.6;
-  background: linear-gradient(to all, #fff, #9034ce);
+  background: linear-gradient(#fff, #9034ce);
 }
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true,
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true i {
