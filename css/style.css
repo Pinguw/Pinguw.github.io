@@ -1382,11 +1382,11 @@ body {
 }
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item {
   padding: 0 36px;
-  color: #9ca2a8;
+  color: #9034ce;
   border-radius: var(--radius);
   margin-bottom: 10px;
   text-align: center;
-  transition: none !important;
+  transition: fade !important;
 }
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true,
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true i {
