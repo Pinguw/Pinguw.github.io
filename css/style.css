@@ -1387,11 +1387,11 @@ body {
   margin-bottom: 10px;
   text-align: center;
   opacity: 1;
-  transition: opacity 0.6s ease;
+  transition: opacity 1.2s ease;
 }
 
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item:hover {
-  opacity: 0.5;
+  opacity: 0.8;
 }
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true,
 .nexmoe #nexmoe-header .nexmoe-list .nexmoe-list-item.true i {
