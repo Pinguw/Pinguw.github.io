@@ -1371,7 +1371,7 @@ body {
   -ms-flex: 1;
   flex: 1;
   text-align: center;
-  color: #a3a8ae;
+  color: #444;
 }
 .nexmoe #nexmoe-header .nexmoe-count div span {
   color: var(--color-text-2);
