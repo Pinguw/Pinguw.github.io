@@ -1658,14 +1658,14 @@ body {
 .nexmoe #nexmoe-header .nexmoe-copyright {
   padding: 0 30px;
   text-align: center;
-  color: #777;
+  color: #fff;
   white-space: normal;
   margin-bottom: 20px;
   font-size: 12px;
 }
 
 .nexmoe #nexmoe-header .nexmoe-copyright a {
-  color: var(--color-primary);
+  color: #9d79ff;
 }
 
 @media screen and (max-width: 1024px) {
