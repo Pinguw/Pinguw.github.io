@@ -9,16 +9,17 @@
 <meta name="description" content="浅谈VM虚拟机1. 什么是虚拟机？ 虚拟机：自己定义一套指令，在程序中能有一套函数和结构解释自己定义的指令并执行功能。  查一下维基百科  虚拟机（英语：virtual machine），在计算机科学中的体系结构里，是指一种特殊的软件，可以在计算机平台和终端用户之间创建一种环境，而终端用户则是基于虚拟机这个软件所创建的环境来操作其它软件。虚拟机（VM）是计算机系统的仿真器，通过软件模拟具有完整硬件">
 <meta property="og:type" content="article">
 <meta property="og:title" content="浅谈VM虚拟机">
-<meta property="og:url" content="http://example.com/2024/03/26/aboutvm/index.html">
+<meta property="og:url" content="http://example.com/2024/03/26/Reverse/aboutvm/index.html">
 <meta property="og:site_name" content="Pinguw&#39;s Blog">
 <meta property="og:description" content="浅谈VM虚拟机1. 什么是虚拟机？ 虚拟机：自己定义一套指令，在程序中能有一套函数和结构解释自己定义的指令并执行功能。  查一下维基百科  虚拟机（英语：virtual machine），在计算机科学中的体系结构里，是指一种特殊的软件，可以在计算机平台和终端用户之间创建一种环境，而终端用户则是基于虚拟机这个软件所创建的环境来操作其它软件。虚拟机（VM）是计算机系统的仿真器，通过软件模拟具有完整硬件">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://i0.imgs.ovh/2024/03/11/RcaSd.png">
 <meta property="og:image" content="https://i0.imgs.ovh/2024/03/11/RcaSd.png">
 <meta property="article:published_time" content="2024-03-26T14:43:22.000Z">
-<meta property="article:modified_time" content="2024-03-26T14:57:45.098Z">
+<meta property="article:modified_time" content="2024-04-11T13:11:48.145Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="Re分享">
+<meta property="article:tag" content="刷题记录">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://i0.imgs.ovh/2024/03/11/RcaSd.png">
 
@@ -26,15 +27,15 @@
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1712841034191">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1712841178578">
 
-<link rel="stylesheet" href="/css/style.css?v=1712841034191">
+<link rel="stylesheet" href="/css/style.css?v=1712841178578">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1712841034191">
+        <link rel="stylesheet" href="/custom.css?v=1712841178578">
     
 
 
@@ -44,7 +45,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1712841034191"></script>
+<script async src="/js/app.js?v=1712841178578"></script>
 
  
 
@@ -67,9 +68,9 @@
         </a>
     </div>
     <div class="nexmoe-count">
-        <div><span>Articles</span>4</div>
-        <div><span>Tags</span>3</div>
-        <div><span>Categories</span>0</div>
+        <div><span>Articles</span>3</div>
+        <div><span>Tags</span>2</div>
+        <div><span>Categories</span>1</div>
     </div>
     <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
         
@@ -162,13 +163,37 @@
     
         
         
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/Reverse/">Reverse</a>
+          <span class="category-list-count">3</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
 
     
         
         
   <div class="nexmoe-widget-wrap">
     <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
-      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 20px;">Re分享</a> <a href="/tags/test/" style="font-size: 10px;">test</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 10px;">刷题记录</a>
+      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 10px;">Re分享</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 20px;">刷题记录</a>
     </div>
     
   </div>
@@ -180,7 +205,7 @@
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">Archive</h3>
     <div class="nexmoe-widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">4</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">3</span></li></ul>
     </div>
   </div>
 
@@ -195,19 +220,15 @@
       <ul>
         
           <li>
-            <a href="/2024/04/10/VirtualTree/">MRCTF2020 VirtualTree（花指令+动态调试）</a>
+            <a href="/2024/04/10/Reverse/VirtualTree/">MRCTF2020 VirtualTree（花指令+动态调试）</a>
           </li>
         
           <li>
-            <a href="/2024/03/26/LLVM/">去OLLVM平坦化([SUCTF2019]hardCPP)</a>
+            <a href="/2024/03/26/Reverse/LLVM/">去OLLVM平坦化([SUCTF2019]hardCPP)</a>
           </li>
         
           <li>
-            <a href="/2024/03/26/aboutvm/">浅谈VM虚拟机</a>
-          </li>
-        
-          <li>
-            <a href="/2024/03/26/test/">test</a>
+            <a href="/2024/03/26/Reverse/aboutvm/">浅谈VM虚拟机</a>
           </li>
         
       </ul>
@@ -262,6 +283,8 @@
     <div class="nexmoe-post-meta">
     <div class="nexmoe-rainbow">
         <a class="nexmoefont icon-calendar-fill">2024年03月26日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/Reverse/">Reverse</a>
         
         
     </div>
@@ -347,7 +370,7 @@
       
     <div class="nexmoe-post-copyright">
         <strong>Author：</strong>Pinguw<br>
-        <strong>Link：</strong><a href="http://example.com/2024/03/26/aboutvm/" title="http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;03&#x2F;26&#x2F;aboutvm&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;03&#x2F;26&#x2F;aboutvm&#x2F;</a><br>
+        <strong>Link：</strong><a href="http://example.com/2024/03/26/Reverse/aboutvm/" title="http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;03&#x2F;26&#x2F;Reverse&#x2F;aboutvm&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;03&#x2F;26&#x2F;Reverse&#x2F;aboutvm&#x2F;</a><br>
         
             <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
 
@@ -360,12 +383,12 @@
   <div class="nexmoe-post-meta nexmoe-rainbow">
    
     
-        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/Re%E5%88%86%E4%BA%AB/" rel="tag">Re分享</a>
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/Re%E5%88%86%E4%BA%AB/" rel="tag">Re分享</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" rel="tag">刷题记录</a>
     
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1712841034160"></script>
+    <script async src="/js/copy-codeblock.js?v=1712841178544"></script>
   
 
   
