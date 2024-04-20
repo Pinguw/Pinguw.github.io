@@ -6,15 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
 
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-<meta name="description" content="别急，我会写的。。。">
+<meta name="description" content="“天堂之门”介绍：天堂之门技术（Heaven’s Gate）是依靠操作系统提供的在不同位数CPU进行跨架构的指令调用（SysWoW64），这使得32位和64位的指令环境可以放在同一个程序中，但是目前的调试器包括IDA在内很少有能跨架构调试的，这使得IDA的反汇编和调试都不能正常进行。  一个在动态调试层面恐怕是最有难度的逆向反调试  架构之间的切换：首先我们要知道32位寄存器cs的值是0x22">
 <meta property="og:type" content="article">
 <meta property="og:title" content="敲响天堂之门">
 <meta property="og:url" content="http://example.com/2024/04/11/Reverse/Gate-of-Heaven/index.html">
 <meta property="og:site_name" content="Pinguw&#39;s Blog">
-<meta property="og:description" content="别急，我会写的。。。">
+<meta property="og:description" content="“天堂之门”介绍：天堂之门技术（Heaven’s Gate）是依靠操作系统提供的在不同位数CPU进行跨架构的指令调用（SysWoW64），这使得32位和64位的指令环境可以放在同一个程序中，但是目前的调试器包括IDA在内很少有能跨架构调试的，这使得IDA的反汇编和调试都不能正常进行。  一个在动态调试层面恐怕是最有难度的逆向反调试  架构之间的切换：首先我们要知道32位寄存器cs的值是0x22">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2024-04-11T14:33:51.000Z">
-<meta property="article:modified_time" content="2024-04-11T14:38:39.669Z">
+<meta property="article:modified_time" content="2024-04-20T07:59:06.805Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="Re分享">
 <meta name="twitter:card" content="summary">
@@ -23,15 +23,15 @@
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1713433267511">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1713611352504">
 
-<link rel="stylesheet" href="/css/style.css?v=1713433267511">
+<link rel="stylesheet" href="/css/style.css?v=1713611352504">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1713433267511">
+        <link rel="stylesheet" href="/custom.css?v=1713611352504">
     
 
 
@@ -41,7 +41,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1713433267511"></script>
+<script async src="/js/app.js?v=1713611352504"></script>
 
  
 
@@ -295,7 +295,27 @@
     
 </div>
 
-    <p>别急，我会写的。。。</p>
+    <!-- 别急，我会写的。。。 -->
+
+<h3 id="“天堂之门”介绍："><a href="#“天堂之门”介绍：" class="headerlink" title="“天堂之门”介绍："></a>“天堂之门”介绍：</h3><p>天堂之门技术（Heaven’s Gate）是依靠操作系统提供的在不同位数CPU进行跨架构的指令调用（SysWoW64），这使得32位和64位的指令环境可以放在同一个程序中，但是目前的调试器包括IDA在内很少有能跨架构调试的，这使得IDA的反汇编和调试都不能正常进行。</p>
+<blockquote>
+<p>一个在动态调试层面恐怕是最有难度的逆向反调试</p>
+</blockquote>
+<h3 id="架构之间的切换："><a href="#架构之间的切换：" class="headerlink" title="架构之间的切换："></a>架构之间的切换：</h3><p>首先我们要知道32位寄存器cs的值是0x22，64位cs寄存器的值是0x33，我们将cs的值在这两者间切换，便达到了跨架构运行程序的目的。</p>
+<p>那么我们如何更改寄存器cs的值呢？<br>我们知道，mov指令是无法直接改变cs寄存器的值的，需要借助<code> call</code>和<code> retf</code>来实现cs段的切换</p>
+<p><code>call far</code>和<code>retf(ret far)</code>是可以同时改变cs和ip的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">push 0x33				;0x33作为cs的新值</span><br><span class="line">call $+5				;下一条指令的地址入栈</span><br><span class="line">add dword [esp], 5		;+5后即是指向retf的下一条指令</span><br><span class="line">retf 					;跳转到下一条指令，同时pop is和pop cs</span><br></pre></td></tr></table></figure>
+
+<p>或者：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmp far 33:地址</span><br></pre></td></tr></table></figure>
+
+<p>这样就实现了将cs改为0x33的功能，即从32位跳转到64位。</p>
+<p>对应的从64位跳转到32位的指令是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">call $+5</span><br><span class="line">mov dword [rsp + 4], 0x23</span><br><span class="line">add dword [rsp], 0xD</span><br><span class="line">retf</span><br></pre></td></tr></table></figure>
+
+<p><strong>so，对cs的更改可以让程序在32位和64之间切换。</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;malloc.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    _asm</span><br><span class="line">    &#123;</span><br><span class="line">        _emit <span class="number">0x6A</span>      <span class="comment">// push 0x33</span></span><br><span class="line">        _emit <span class="number">0x33</span></span><br><span class="line"></span><br><span class="line">        _emit <span class="number">0xE8</span>      <span class="comment">// call $+5</span></span><br><span class="line">        _emit <span class="number">0x05</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line"></span><br><span class="line">        _emit <span class="number">0x83</span>      <span class="comment">// add dword [esp], 5</span></span><br><span class="line">        _emit <span class="number">0x04</span></span><br><span class="line">        _emit <span class="number">0x24</span></span><br><span class="line">        _emit <span class="number">0x05</span></span><br><span class="line"></span><br><span class="line">        _emit <span class="number">0xCB</span>      <span class="comment">// retf</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;进入64位\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    _asm</span><br><span class="line">    &#123;</span><br><span class="line">        _emit <span class="number">0xE8</span>      <span class="comment">// call $+5</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line"></span><br><span class="line">        _emit <span class="number">0xC7</span>      <span class="comment">// mov dword [rsp + 4], 0x23</span></span><br><span class="line">        _emit <span class="number">0x44</span></span><br><span class="line">        _emit <span class="number">0x24</span></span><br><span class="line">        _emit <span class="number">0x04</span></span><br><span class="line">        _emit <span class="number">0x23</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line">        _emit <span class="number">0x00</span></span><br><span class="line"></span><br><span class="line">        _emit <span class="number">0x83</span>      <span class="comment">// add dword [rsp], 0xD</span></span><br><span class="line">        _emit <span class="number">0x04</span></span><br><span class="line">        _emit <span class="number">0x24</span></span><br><span class="line">        _emit <span class="number">0x0D</span></span><br><span class="line"></span><br><span class="line">        _emit <span class="number">0xCB</span>      <span class="comment">// retf</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;回到32位\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
     <p><img src="https://s2.loli.net/2024/04/14/jbJvEX1hxiCz7OR.jpg" loading="eager"></p>
 
@@ -323,7 +343,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1713433267482"></script>
+    <script async src="/js/copy-codeblock.js?v=1713611352483"></script>
   
 
   
@@ -337,6 +357,13 @@
             
 
             
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%9C%E5%A4%A9%E5%A0%82%E4%B9%8B%E9%97%A8%E2%80%9D%E4%BB%8B%E7%BB%8D%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">“天堂之门”介绍：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E4%B9%8B%E9%97%B4%E7%9A%84%E5%88%87%E6%8D%A2%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">架构之间的切换：</span></a></li></ol>
+                </div>
+            </button>
             
 
             
