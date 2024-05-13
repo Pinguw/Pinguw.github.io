@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en"><head>
+<title>H&amp;NCTF2024 - Pinguw&#39;s Blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" type="image/png" />
+<meta name="description" content="Reverse-Baby_OBVBS打开之后看见是VBS混淆，将混淆部分打印出来（base64内容部分略去）： 123456789101112131415161718192021222324252627eAqi &#x3D; &quot;59fc6b263c3d0fcbc331ade699e62d3473bbf85522d588e3423e6c751ca091528a3c0186e460483917192c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="H&amp;NCTF2024">
+<meta property="og:url" content="http://example.com/2024/05/13/%E6%AF%94%E8%B5%9BWP/H&NCTF2024/index.html">
+<meta property="og:site_name" content="Pinguw&#39;s Blog">
+<meta property="og:description" content="Reverse-Baby_OBVBS打开之后看见是VBS混淆，将混淆部分打印出来（base64内容部分略去）： 123456789101112131415161718192021222324252627eAqi &#x3D; &quot;59fc6b263c3d0fcbc331ade699e62d3473bbf85522d588e3423e6c751ca091528a3c0186e460483917192c">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125902232.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125911794.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235327877.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235345611.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235402556.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235442738.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235512749.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235525799.png">
+<meta property="article:published_time" content="2024-05-13T15:48:29.000Z">
+<meta property="article:modified_time" content="2024-05-13T15:57:37.145Z">
+<meta property="article:author" content="Pinguw">
+<meta property="article:tag" content="WriteUp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125902232.png">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1715615874959">
+
+<link rel="stylesheet" href="/css/style.css?v=1715615874959">
+
+
+
+
+    
+        <link rel="stylesheet" href="/custom.css?v=1715615874959">
+    
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/lib/lax.min.js" async></script>
+
+
+<script async src="/js/app.js?v=1715615874959"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script> 
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.1.1"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(https://s2.loli.net/2024/04/14/EJTHkjYwI4dil9K.jpg)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="Pinguw"><img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="Pinguw">
+            <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw" alt="Pinguw">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>5</div>
+        <div><span>Tags</span>3</div>
+        <div><span>Categories</span>1</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archives.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/friends.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/donate.html" title="给我赞助">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                给我赞助
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/aboutme.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://space.bilibili.com/416333261"
+			target="_blank"
+			mdui-tooltip="{content: '哔哩哔哩'}"
+			style="
+				color: rgb(231, 106, 141);
+				background-color: rgba(231, 106, 141, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-bilibili"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/Pinguw"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/Reverse/">Reverse</a>
+          <span class="category-list-count">5</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 20px;">Re分享</a> <a href="/tags/WriteUp/" style="font-size: 10px;">WriteUp</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 20px;">刷题记录</a>
+    </div>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Recent Posts</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/05/13/%E6%AF%94%E8%B5%9BWP/H&NCTF2024/">H&amp;NCTF2024</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/11/Reverse/Gate-of-Heaven/">敲响天堂之门</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/10/Reverse/VirtualTree/">MRCTF2020 VirtualTree（花指令+动态调试）</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/26/Reverse/LLVM/">去OLLVM平坦化([SUCTF2019]hardCPP)</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/26/Reverse/aboutvm/">浅谈VM虚拟机</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+            <li>
+                <a href="https://Pinguw.github.io/" target="_blank" >
+                    <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></img>
+                    <p>Pinguw</p>
+                </a>
+            </li>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2024 Pinguw
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 54.285714285714285%;"> 
+            <img src="https://s2.loli.net/2024/05/13/z67iG2kYAmbuBvR.jpg" alt="H&amp;NCTF2024" loading="lazy">
+            <h1>H&amp;NCTF2024</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2024年05月13日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/Reverse/">Reverse</a>
+        
+        
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h2 id="Reverse-Baby-OBVBS"><a href="#Reverse-Baby-OBVBS" class="headerlink" title="Reverse-Baby_OBVBS"></a>Reverse-Baby_OBVBS</h2><p>打开之后看见是VBS混淆，将混淆部分打印出来（base64内容部分略去）：</p>
+<figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">eAqi = <span class="string">&quot;59fc6b263c3d0fcbc331ade699e62d3473bbf85522d588e3423e6c751ca091528a3c0186e460483917192c14&quot;</span></span><br><span class="line">ANtg = <span class="string">&quot;baacc7ffa8232d28f814bb14c428798b&quot;</span></span><br><span class="line"><span class="keyword">Function</span> Base64Decode(base64EncodedString)</span><br><span class="line">    <span class="keyword">Dim</span> xml, elem</span><br><span class="line">    <span class="keyword">Set</span> xml = <span class="built_in">CreateObject</span>(<span class="string">&quot;MSXML2.DOMDocument&quot;</span>)</span><br><span class="line">    <span class="keyword">Set</span> elem = xml.createElement(<span class="string">&quot;tmp&quot;</span>)</span><br><span class="line">    elem.dataType = <span class="string">&quot;bin.base64&quot;</span> </span><br><span class="line">    elem.text = base64EncodedString </span><br><span class="line">    <span class="keyword">Dim</span> stream</span><br><span class="line">    <span class="keyword">Set</span> stream = <span class="built_in">CreateObject</span>(<span class="string">&quot;ADODB.Stream&quot;</span>)</span><br><span class="line">    stream.Type = <span class="number">1</span> <span class="comment">&#x27;Binary</span></span><br><span class="line">    stream.Open</span><br><span class="line">    stream.Write elem.nodeTypedValue </span><br><span class="line">    stream.Position = <span class="number">0</span></span><br><span class="line">    stream.Type = <span class="number">2</span> <span class="comment">&#x27;Text</span></span><br><span class="line">    stream.Charset = <span class="string">&quot;utf-8&quot;</span></span><br><span class="line">    Base64Decode = stream.ReadText</span><br><span class="line">    stream.Close</span><br><span class="line"><span class="keyword">End</span> <span class="keyword">Function</span></span><br><span class="line">nbbt=<span class="string">&quot;RnVuY3Rpb24gSW5pdGlhbGl6ZShzdHJQd2QpDQogICAgRGltIGJveCgyNTYpDQogICAgRGltIHRlbXBTd2FwDQogICAgRGltIGENCiAg&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(nbbt)</span><br><span class="line">NFqt=<span class="string">&quot;RnVuY3Rpb24gTXlmdW5jKHNZCBGdW5jdGlvbg==&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(NFqt)</span><br><span class="line">NsFw=<span class="string">&quot;RnVuY3Rpb24gRWNTYpDQogICAgICAgIGVuY3J5cHRlZERhdGEgPSBlbmNyeXB0ZWREYXRhICYgTENhc2UoUmlnaHQoIjAiICYgSGV4KHkpLCAyKSkNCiAgICBOZXh0DQogICAgRW5DcnlwdCA9IGVuY3J5cHRlZERhdGENCkVuZCBGdW5jdGlvbg==&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(NsFw)</span><br><span class="line">hYLu=<span class="string">&quot;bXNnYm94ICJEbyB5b3Uga28gImJ5ZSEi&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(hYLu)</span><br></pre></td></tr></table></figure>
+
+<p>base64解密后得到加密代码：</p>
+<figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Function</span> RC4_init(strPwd)</span><br><span class="line">    <span class="keyword">Dim</span> box(<span class="number">256</span>)</span><br><span class="line">    <span class="keyword">Dim</span> tempSwap</span><br><span class="line">    <span class="keyword">Dim</span> a</span><br><span class="line">    <span class="keyword">Dim</span> b</span><br><span class="line"></span><br><span class="line">    <span class="keyword">For</span> i = <span class="number">0</span> <span class="keyword">To</span> <span class="number">255</span></span><br><span class="line">        box(i) = i</span><br><span class="line">    <span class="keyword">Next</span></span><br><span class="line"></span><br><span class="line">    a = <span class="number">0</span></span><br><span class="line">    b = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">For</span> i = <span class="number">0</span> <span class="keyword">To</span> <span class="number">255</span></span><br><span class="line">        a = (a + box(i) + <span class="built_in">Asc</span>(<span class="built_in">Mid</span>(strPwd, (i Mod <span class="built_in">Len</span>(strPwd)) + <span class="number">1</span>, <span class="number">1</span>))) Mod <span class="number">256</span></span><br><span class="line">        tempSwap = box(i)</span><br><span class="line">        box(i) = box(a)</span><br><span class="line">        box(a) = tempSwap</span><br><span class="line">    <span class="keyword">Next</span></span><br><span class="line"></span><br><span class="line">    RC4_init = box</span><br><span class="line"><span class="keyword">End</span> <span class="keyword">Function</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">Function</span> MD5(strToHash)</span><br><span class="line">    <span class="keyword">Dim</span> tmpFile, strCommand, objFSO, objWshShell, out</span><br><span class="line">    <span class="keyword">Set</span> objFSO = <span class="built_in">CreateObject</span>(<span class="string">&quot;Scripting.FileSystemObject&quot;</span>)</span><br><span class="line">    <span class="keyword">Set</span> objWshShell = <span class="built_in">CreateObject</span>(<span class="string">&quot;WScript.Shell&quot;</span>)</span><br><span class="line">    tmpFile = objFSO.GetSpecialFolder(<span class="number">2</span>).Path &amp; <span class="string">&quot;\&quot;</span> &amp; objFSO.GetTempName</span><br><span class="line">    objFSO.CreateTextFile(tmpFile).Write(strToHash)</span><br><span class="line">    strCommand = <span class="string">&quot;certutil -hashfile &quot;</span> &amp; tmpFile &amp; <span class="string">&quot; MD5&quot;</span></span><br><span class="line">    out = objWshShell.Exec(strCommand).StdOut.ReadAll</span><br><span class="line">    objFSO.DeleteFile tmpFile</span><br><span class="line">    MD5 = <span class="built_in">Replace</span>(<span class="built_in">Split</span>(<span class="built_in">Trim</span>(out), vbCrLf)(<span class="number">1</span>), <span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line"><span class="keyword">End</span> <span class="keyword">Function</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">Function</span> RC4(box, strData)</span><br><span class="line">    <span class="keyword">Dim</span> tempSwap</span><br><span class="line">    <span class="keyword">Dim</span> a</span><br><span class="line">    <span class="keyword">Dim</span> b</span><br><span class="line">    <span class="keyword">Dim</span> x</span><br><span class="line">    <span class="keyword">Dim</span> y</span><br><span class="line">    <span class="keyword">Dim</span> encryptedData</span><br><span class="line">    encryptedData = <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="keyword">For</span> x = <span class="number">1</span> <span class="keyword">To</span> <span class="built_in">Len</span>(strData)</span><br><span class="line">        a = (a + <span class="number">1</span>) Mod <span class="number">256</span></span><br><span class="line">        b = (b + box(a)) Mod <span class="number">256</span></span><br><span class="line">        tempSwap = box(a)</span><br><span class="line">        box(a) = box(b)</span><br><span class="line">        box(b) = tempSwap</span><br><span class="line">        y = <span class="built_in">Asc</span>(<span class="built_in">Mid</span>(strData, x, <span class="number">1</span>)) <span class="keyword">Xor</span> box((box(a) + box(b)) Mod <span class="number">256</span>)</span><br><span class="line">        encryptedData = encryptedData &amp; <span class="built_in">LCase</span>(<span class="built_in">Right</span>(<span class="string">&quot;0&quot;</span> &amp; <span class="built_in">Hex</span>(y), <span class="number">2</span>))</span><br><span class="line">    <span class="keyword">Next</span></span><br><span class="line">    RC4 = encryptedData</span><br><span class="line"><span class="keyword">End</span> <span class="keyword">Function</span></span><br><span class="line"></span><br><span class="line">msgbox <span class="string">&quot;Do you know VBScript?&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;VBScript (&quot;&quot;Microsoft Visual Basic Scripting Edition&quot;&quot;) is a deprecated Active Scripting language developed by Microsoft that is modeled on Visual Basic.&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;It allows Microsoft Windows system administrators to generate powerful tools for managing computers without error handling and with subroutines and other advanced programming constructs. It can give the user complete control over many aspects of their computing environment.&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;Interestingly, although VBScript has long since been deprecated, you can still run VBScript scripts on the latest versions of Windows 11 systems.&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;A VBScript script must be executed within a host environment, of which there are several provided with Microsoft Windows, including: Windows Script Host (WSH), Internet Explorer (IE), and Internet Information Services (IIS).&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;For .vbs files, the host is Windows Script Host (WSH), aka wscript.exe/cscript.exe program in your system.&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;If you can not stop a VBScript from running (e.g. a dead loop), go to the task manager and kill wscript.exe/cscript.exe.&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;cscript and wscript are executables for the scripting host that are used to run the scripts. cscript and wscript are both interpreters to run VBScript (and other scripting languages like JScript) on the Windows platform.&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;cscript is for console applications and wscript is for Windows applications. It has something to do with STDIN, STDOUT and STDERR.&quot;</span></span><br><span class="line">msgbox <span class="string">&quot;OK! Now, let us begin our journey.&quot;</span></span><br><span class="line"></span><br><span class="line">key = <span class="built_in">InputBox</span>(<span class="string">&quot;Enter the key:&quot;</span>, <span class="string">&quot;CTF Challenge&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> (key = <span class="literal">False</span>) <span class="keyword">then</span> wscript.quit</span><br><span class="line"><span class="keyword">if</span> (<span class="built_in">len</span>(key)&lt;&gt;<span class="number">6</span>) <span class="keyword">then</span></span><br><span class="line">    wscript.echo <span class="string">&quot;wrong key length!&quot;</span></span><br><span class="line">    wscript.quit</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">if</span></span><br><span class="line"><span class="keyword">If</span> (MD5(key) = md5_key) <span class="keyword">Then</span></span><br><span class="line">    wscript.echo <span class="string">&quot;You get the key!Move to next challenge.&quot;</span></span><br><span class="line"><span class="keyword">Else</span></span><br><span class="line">    wscript.echo <span class="string">&quot;Wrong key!Try again!&quot;</span></span><br><span class="line">    wscript.quit</span><br><span class="line"><span class="keyword">End</span> <span class="keyword">If</span></span><br><span class="line"></span><br><span class="line">userInput = <span class="built_in">InputBox</span>(<span class="string">&quot;Enter the flag:&quot;</span>, <span class="string">&quot;CTF Challenge&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> (userInput = <span class="literal">False</span>) <span class="keyword">then</span> wscript.quit</span><br><span class="line"><span class="keyword">if</span> (<span class="built_in">len</span>(userInput)&lt;&gt;<span class="number">44</span>) <span class="keyword">then</span></span><br><span class="line">    wscript.echo <span class="string">&quot;wrong!&quot;</span></span><br><span class="line">    wscript.quit</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">if</span></span><br><span class="line">box = RC4_init(key)</span><br><span class="line">encryptedInput = RC4(box, userInput)</span><br><span class="line"></span><br><span class="line"><span class="keyword">If</span> (encryptedInput = enc_flag) <span class="keyword">Then</span></span><br><span class="line">    MsgBox <span class="string">&quot;Congratulations! You have learned VBS!&quot;</span></span><br><span class="line"><span class="keyword">Else</span></span><br><span class="line">    MsgBox <span class="string">&quot;Wrong flag. Try again.&quot;</span></span><br><span class="line"><span class="keyword">End</span> <span class="keyword">If</span></span><br><span class="line"></span><br><span class="line">wscript.echo <span class="string">&quot;bye!&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&#x27; enc_flag = 0x59fc6b263c3d0fcbc331ade699e62d3473bbf85522d588e3423e6c751ca091528a3c0186e460483917192c14</span></span><br><span class="line"><span class="comment">&#x27; md5(key) = baacc7ffa8232d28f814bb14c428798b</span></span><br></pre></td></tr></table></figure>
+
+<p>RC4加密，key只有md5后的哈希，用hashcat爆破拿到key</p>
+<p>解密：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ./hashcat.exe -a 3 -m 0 -d 1 &quot;baacc7ffa8232d28f814bb14c428798b&quot; ?a?a?a?a?a?a</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">rc4_decrypt</span>(<span class="params">key, ciphertext</span>):</span><br><span class="line">    S = <span class="built_in">list</span>(<span class="built_in">range</span>(<span class="number">256</span>))</span><br><span class="line">    j = <span class="number">0</span></span><br><span class="line">    out = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">256</span>):</span><br><span class="line">        j = (j + S[i] + key[i % <span class="built_in">len</span>(key)]) % <span class="number">256</span></span><br><span class="line">        S[i], S[j] = S[j], S[i]</span><br><span class="line"></span><br><span class="line">    i = j = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> char <span class="keyword">in</span> ciphertext:</span><br><span class="line">        i = (i + <span class="number">1</span>) % <span class="number">256</span></span><br><span class="line">        j = (j + S[i]) % <span class="number">256</span></span><br><span class="line">        S[i], S[j] = S[j], S[i]</span><br><span class="line">        out.append(char ^ S[(S[i] + S[j]) % <span class="number">256</span>])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">bytes</span>(out)</span><br><span class="line"></span><br><span class="line">key = <span class="string">&#x27;H&amp;NKEY&#x27;</span></span><br><span class="line">ciphertext = <span class="built_in">bytes</span>.fromhex(<span class="string">&#x27;59fc6b263c3d0fcbc331ade699e62d3473bbf85522d588e3423e6c751ca091528a3c0186e460483917192c14&#x27;</span>)</span><br><span class="line"></span><br><span class="line">plaintext = rc4_decrypt(key.encode(), ciphertext)</span><br><span class="line"><span class="built_in">print</span>(plaintext)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>H&amp;NCTF{VBS_1s_@_s0_7unny_an4_pow3rfu1_t00l!}</p>
+</blockquote>
+<h2 id="Reverse-hnwanna"><a href="#Reverse-hnwanna" class="headerlink" title="Reverse-hnwanna"></a>Reverse-hnwanna</h2><p>找到主函数，申清加密逻辑：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125902232.png" alt="image-20240512125902232" data-caption="image-20240512125902232" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125911794.png" alt="image-20240512125911794" data-caption="image-20240512125911794" loading="lazy"></p>
+<p>写解密代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">a</span><span class="params">(<span class="type">char</span>* input, <span class="type">int</span> shift)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">char</span> text[<span class="number">19</span>];</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;H&amp;NCTF&#123;&quot;</span>);</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">18</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>(input[i] &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; input[i] &lt;= <span class="string">&#x27;z&#x27;</span>)</span><br><span class="line">			text[i] = ((<span class="type">char</span>)(((<span class="type">int</span>)(input[i] - <span class="string">&#x27;a&#x27;</span>) + shift) % <span class="number">26</span> + <span class="number">97</span>));</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			text[i] += input[i];</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, text[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;&#125;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">char</span> enc[] = <span class="string">&quot;justaeasyunitygame&quot;</span>;</span><br><span class="line">	<span class="type">int</span> key = <span class="number">5</span>;</span><br><span class="line">	<span class="built_in">a</span>(enc, key);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>H&amp;NCTF{ozxyfjfxdzsnydlfrj}</p>
+</blockquote>
+<h2 id="Reverse-DO-YOU-KNOW-SWDD"><a href="#Reverse-DO-YOU-KNOW-SWDD" class="headerlink" title="Reverse-DO YOU KNOW SWDD?"></a>Reverse-DO YOU KNOW SWDD?</h2><p>在异常处发现有SMC，找到SMC函数：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235327877.png" alt="image-20240513235327877" data-caption="image-20240513235327877" loading="lazy"></p>
+<p> 写IDC脚本解密：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235345611.png" alt="image-20240513235345611" data-caption="image-20240513235345611" loading="lazy"></p>
+<p> 得到加密函数：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235402556.png" alt="image-20240513235402556" data-caption="image-20240513235402556" loading="lazy"></p>
+<p> 解密：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">char</span> enc[] = <span class="string">&quot;S_VYFO_CGNN_GRKD_KLYED_IYE&quot;</span>;</span><br><span class="line">    <span class="type">int</span> v4 = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;H&amp;NCTF&#123;&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; enc[i]; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(enc[i] &gt;= <span class="number">65</span> &amp;&amp; enc[i] &lt;= <span class="number">90</span>)</span><br><span class="line">            enc[i] = (enc[i] - v4 + <span class="number">65</span>) % <span class="number">26</span> + <span class="number">65</span>;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, enc[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&#125;&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">#include &lt;idc.idc&gt;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">static main()</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">    auto addr = 0x00417001;</span></span><br><span class="line"><span class="comment">    auto i = 0;</span></span><br><span class="line"><span class="comment">    auto j = 0;</span></span><br><span class="line"><span class="comment">    auto v5 = &quot;swdd&quot;;</span></span><br><span class="line"><span class="comment">    for(j = addr; j &lt; 0x0041815B; j++)</span></span><br><span class="line"><span class="comment">        PatchByte(j, Byte(j) ^ 4);</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>H&amp;NCTF{I_LOVE_SWDD_WHAT_ABOUT_YOU}</p>
+</blockquote>
+<h2 id="Reverse-最喜欢的逆向题"><a href="#Reverse-最喜欢的逆向题" class="headerlink" title="Reverse-最喜欢的逆向题"></a>Reverse-最喜欢的逆向题</h2><p>自己看图：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235442738.png" alt="image-20240513235442738" data-caption="image-20240513235442738" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235512749.png" alt="image-20240513235512749" data-caption="image-20240513235512749" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235525799.png" alt="image-20240513235525799" data-caption="image-20240513235525799" loading="lazy"></p>
+<blockquote>
+<p>H&amp;NCTF{Do_Y0u_like_F5_1n_Rev}</p>
+</blockquote>
+
+    <p><img src="https://s2.loli.net/2024/04/14/jbJvEX1hxiCz7OR.jpg" loading="eager"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>Author：</strong>Pinguw<br>
+        <strong>Link：</strong><a href="http://example.com/2024/05/13/%E6%AF%94%E8%B5%9BWP/H&NCTF2024/" title="http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;05&#x2F;13&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;H&amp;NCTF2024&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;05&#x2F;13&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;H&amp;NCTF2024&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/WriteUp/" rel="tag">WriteUp</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1715615874946"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Reverse-Baby-OBVBS"><span class="toc-number">1.</span> <span class="toc-text">Reverse-Baby_OBVBS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reverse-hnwanna"><span class="toc-number">2.</span> <span class="toc-text">Reverse-hnwanna</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reverse-DO-YOU-KNOW-SWDD"><span class="toc-number">3.</span> <span class="toc-text">Reverse-DO YOU KNOW SWDD?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reverse-%E6%9C%80%E5%96%9C%E6%AC%A2%E7%9A%84%E9%80%86%E5%90%91%E9%A2%98"><span class="toc-number">4.</span> <span class="toc-text">Reverse-最喜欢的逆向题</span></a></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="Search" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
