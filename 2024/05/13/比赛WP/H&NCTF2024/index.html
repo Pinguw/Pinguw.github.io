@@ -13,34 +13,25 @@
 <meta property="og:site_name" content="Pinguw&#39;s Blog">
 <meta property="og:description" content="Reverse-Baby_OBVBS打开之后看见是VBS混淆，将混淆部分打印出来（base64内容部分略去）： 123456789101112131415161718192021222324252627eAqi &#x3D; &quot;59fc6b263c3d0fcbc331ade699e62d3473bbf85522d588e3423e6c751ca091528a3c0186e460483917192c">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125902232.png">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125911794.png">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235327877.png">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235345611.png">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235402556.png">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235442738.png">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235512749.png">
-<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235525799.png">
 <meta property="article:published_time" content="2024-05-13T15:48:29.000Z">
-<meta property="article:modified_time" content="2024-05-13T15:57:37.145Z">
+<meta property="article:modified_time" content="2024-05-13T16:05:47.386Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="WriteUp">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125902232.png">
 
 <link rel="stylesheet" href="/lib/fancybox/fancybox.css">
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1715615874959">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1715616351159">
 
-<link rel="stylesheet" href="/css/style.css?v=1715615874959">
+<link rel="stylesheet" href="/css/style.css?v=1715616351159">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1715615874959">
+        <link rel="stylesheet" href="/custom.css?v=1715616351159">
     
 
 
@@ -50,7 +41,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1715615874959"></script>
+<script async src="/js/app.js?v=1715616351159"></script>
 
  
 
@@ -322,8 +313,8 @@
 <p>H&amp;NCTF{VBS_1s_@_s0_7unny_an4_pow3rfu1_t00l!}</p>
 </blockquote>
 <h2 id="Reverse-hnwanna"><a href="#Reverse-hnwanna" class="headerlink" title="Reverse-hnwanna"></a>Reverse-hnwanna</h2><p>找到主函数，申清加密逻辑：</p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125902232.png" alt="image-20240512125902232" data-caption="image-20240512125902232" loading="lazy"></p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240512125911794.png" alt="image-20240512125911794" data-caption="image-20240512125911794" loading="lazy"></p>
+<p>![hnwanna1](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\hnwanna1.png)</p>
+<p>![hnwanna2](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\hnwanna2.png)</p>
 <p>写解密代码：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">a</span><span class="params">(<span class="type">char</span>* input, <span class="type">int</span> shift)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">char</span> text[<span class="number">19</span>];</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;H&amp;NCTF&#123;&quot;</span>);</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">18</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>(input[i] &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; input[i] &lt;= <span class="string">&#x27;z&#x27;</span>)</span><br><span class="line">			text[i] = ((<span class="type">char</span>)(((<span class="type">int</span>)(input[i] - <span class="string">&#x27;a&#x27;</span>) + shift) % <span class="number">26</span> + <span class="number">97</span>));</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			text[i] += input[i];</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, text[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;&#125;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">char</span> enc[] = <span class="string">&quot;justaeasyunitygame&quot;</span>;</span><br><span class="line">	<span class="type">int</span> key = <span class="number">5</span>;</span><br><span class="line">	<span class="built_in">a</span>(enc, key);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -331,11 +322,11 @@
 <p>H&amp;NCTF{ozxyfjfxdzsnydlfrj}</p>
 </blockquote>
 <h2 id="Reverse-DO-YOU-KNOW-SWDD"><a href="#Reverse-DO-YOU-KNOW-SWDD" class="headerlink" title="Reverse-DO YOU KNOW SWDD?"></a>Reverse-DO YOU KNOW SWDD?</h2><p>在异常处发现有SMC，找到SMC函数：</p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235327877.png" alt="image-20240513235327877" data-caption="image-20240513235327877" loading="lazy"></p>
+<p>![SMC1](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\SMC1.png)</p>
 <p> 写IDC脚本解密：</p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235345611.png" alt="image-20240513235345611" data-caption="image-20240513235345611" loading="lazy"></p>
+<p>![SMC2](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\SMC2.png)</p>
 <p> 得到加密函数：</p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235402556.png" alt="image-20240513235402556" data-caption="image-20240513235402556" loading="lazy"></p>
+<p>![SMC3](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\SMC3.png)</p>
 <p> 解密：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">char</span> enc[] = <span class="string">&quot;S_VYFO_CGNN_GRKD_KLYED_IYE&quot;</span>;</span><br><span class="line">    <span class="type">int</span> v4 = <span class="number">10</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;H&amp;NCTF&#123;&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; enc[i]; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(enc[i] &gt;= <span class="number">65</span> &amp;&amp; enc[i] &lt;= <span class="number">90</span>)</span><br><span class="line">            enc[i] = (enc[i] - v4 + <span class="number">65</span>) % <span class="number">26</span> + <span class="number">65</span>;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, enc[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&#125;&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">#include &lt;idc.idc&gt;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">static main()</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">    auto addr = 0x00417001;</span></span><br><span class="line"><span class="comment">    auto i = 0;</span></span><br><span class="line"><span class="comment">    auto j = 0;</span></span><br><span class="line"><span class="comment">    auto v5 = &quot;swdd&quot;;</span></span><br><span class="line"><span class="comment">    for(j = addr; j &lt; 0x0041815B; j++)</span></span><br><span class="line"><span class="comment">        PatchByte(j, Byte(j) ^ 4);</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
 
@@ -343,9 +334,9 @@
 <p>H&amp;NCTF{I_LOVE_SWDD_WHAT_ABOUT_YOU}</p>
 </blockquote>
 <h2 id="Reverse-最喜欢的逆向题"><a href="#Reverse-最喜欢的逆向题" class="headerlink" title="Reverse-最喜欢的逆向题"></a>Reverse-最喜欢的逆向题</h2><p>自己看图：</p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235442738.png" alt="image-20240513235442738" data-caption="image-20240513235442738" loading="lazy"></p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235512749.png" alt="image-20240513235512749" data-caption="image-20240513235512749" loading="lazy"></p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240513235525799.png" alt="image-20240513235525799" data-caption="image-20240513235525799" loading="lazy"></p>
+<p>![not_re1](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\not_re1.png)</p>
+<p>![not_re2](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\not_re2.png)</p>
+<p>![not_re3](E:\Pinguw’s Blog\source_posts\比赛WP\H&amp;NCTF2024\not_re3.png)</p>
 <blockquote>
 <p>H&amp;NCTF{Do_Y0u_like_F5_1n_Rev}</p>
 </blockquote>
@@ -376,7 +367,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1715615874946"></script>
+    <script async src="/js/copy-codeblock.js?v=1715616351134"></script>
   
 
   
