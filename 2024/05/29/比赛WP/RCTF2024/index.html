@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en"><head>
+<title>RCTF2024 - Pinguw&#39;s Blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" type="image/png" />
+<meta name="description" content="Reverse2048审计源码，看出每轮将获得分数为输入的sorce，上限为当前得分，初次上限为1w，那么每次成功分数翻倍的情况下用不了几次即可到达100w分：   RCTF{you_are_2048_master}  bloker_vm在每种case中下断点，可得到加密逻辑， 但是没看出反调试的影响在哪里。  解密代码： 1234567891011121314151617181920212223">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RCTF2024">
+<meta property="og:url" content="http://example.com/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/index.html">
+<meta property="og:site_name" content="Pinguw&#39;s Blog">
+<meta property="og:description" content="Reverse2048审计源码，看出每轮将获得分数为输入的sorce，上限为当前得分，初次上限为1w，那么每次成功分数翻倍的情况下用不了几次即可到达100w分：   RCTF{you_are_2048_master}  bloker_vm在每种case中下断点，可得到加密逻辑， 但是没看出反调试的影响在哪里。  解密代码： 1234567891011121314151617181920212223">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/RCTF2024/2048.png">
+<meta property="og:image" content="http://example.com/RCTF2024/vm.png">
+<meta property="og:image" content="http://example.com/RCTF2024/tree.png">
+<meta property="og:image" content="http://example.com/RCTF2024/mix.png">
+<meta property="og:image" content="http://example.com/RCTF2024/z3.png">
+<meta property="og:image" content="http://example.com/RCTF2024/trytry.png">
+<meta property="og:image" content="http://example.com/RCTF2024/flag.png">
+<meta property="og:image" content="http://example.com/RCTF2024/3000.png">
+<meta property="og:image" content="http://example.com/RCTF2024/enc.png">
+<meta property="og:image" content="http://example.com/RCTF2024/cawcaw1kaka.png">
+<meta property="article:published_time" content="2024-05-29T12:52:43.000Z">
+<meta property="article:modified_time" content="2024-05-29T13:02:38.396Z">
+<meta property="article:author" content="Pinguw">
+<meta property="article:tag" content="WriteUp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/RCTF2024/2048.png">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1716987763699">
+
+<link rel="stylesheet" href="/css/style.css?v=1716987763699">
+
+
+
+
+    
+        <link rel="stylesheet" href="/custom.css?v=1716987763699">
+    
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/lib/lax.min.js" async></script>
+
+
+<script async src="/js/app.js?v=1716987763699"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script> 
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.1.1"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(https://s2.loli.net/2024/04/14/EJTHkjYwI4dil9K.jpg)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="Pinguw"><img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="Pinguw">
+            <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw" alt="Pinguw">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>7</div>
+        <div><span>Tags</span>3</div>
+        <div><span>Categories</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archives.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/friends.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/donate.html" title="给我赞助">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                给我赞助
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/aboutme.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://space.bilibili.com/416333261"
+			target="_blank"
+			mdui-tooltip="{content: '哔哩哔哩'}"
+			style="
+				color: rgb(231, 106, 141);
+				background-color: rgba(231, 106, 141, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-bilibili"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/Pinguw"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/Reverse/">Reverse</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/比赛WP/">比赛WP</a>
+          <span class="category-list-count">3</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 10px;">Re分享</a> <a href="/tags/WriteUp/" style="font-size: 10px;">WriteUp</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 10px;">刷题记录</a>
+    </div>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">7</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Recent Posts</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/">RCTF2024</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/">CISCN2024</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/13/%E6%AF%94%E8%B5%9BWP/H&NCTF2024/">H&amp;NCTF2024</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/11/Reverse/Gate-of-Heaven/">敲响天堂之门</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/10/Reverse/VirtualTree/">MRCTF2020 VirtualTree（花指令+动态调试）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+            <li>
+                <a href="https://Pinguw.github.io/" target="_blank" >
+                    <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></img>
+                    <p>Pinguw</p>
+                </a>
+            </li>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2024 Pinguw
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 54.285714285714285%;"> 
+            <img src="https://s2.loli.net/2024/05/29/uYdacfjO3zTbK7n.webp" alt="RCTF2024" loading="lazy">
+            <h1>RCTF2024</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2024年05月29日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E6%AF%94%E8%B5%9BWP/">比赛WP</a>
+        
+        
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h1 id="Reverse"><a href="#Reverse" class="headerlink" title="Reverse"></a>Reverse</h1><h2 id="2048"><a href="#2048" class="headerlink" title="2048"></a>2048</h2><p>审计源码，看出每轮将获得分数为输入的sorce，上限为当前得分，初次上限为1w，那么每次成功分数翻倍的情况下用不了几次即可到达100w分：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/2048.png" alt="img" data-caption="img" loading="lazy"></p>
+<blockquote>
+<p>RCTF{you_are_2048_master}</p>
+</blockquote>
+<h2 id="bloker-vm"><a href="#bloker-vm" class="headerlink" title="bloker_vm"></a>bloker_vm</h2><p>在每种case中下断点，可得到加密逻辑，</p>
+<p>但是没看出反调试的影响在哪里。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/vm.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>解密代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">rc4</span><span class="params">(<span class="type">unsigned</span> <span class="type">char</span>* input, <span class="type">int</span> input_len, <span class="type">char</span>* key, <span class="type">int</span> key_len)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> result; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">char</span> v5; <span class="comment">// [esp+D3h] [ebp-155h]</span></span><br><span class="line">    <span class="type">char</span> v6; <span class="comment">// [esp+D3h] [ebp-155h]</span></span><br><span class="line">    <span class="type">int</span> v7; <span class="comment">// [esp+F4h] [ebp-134h]</span></span><br><span class="line">    <span class="type">int</span> i; <span class="comment">// [esp+100h] [ebp-128h]</span></span><br><span class="line">    <span class="type">int</span> j; <span class="comment">// [esp+100h] [ebp-128h]</span></span><br><span class="line">    <span class="type">int</span> k; <span class="comment">// [esp+100h] [ebp-128h]</span></span><br><span class="line">    <span class="type">unsigned</span> __int8 v11; <span class="comment">// [esp+10Fh] [ebp-119h]</span></span><br><span class="line">    <span class="type">unsigned</span> __int8 v12; <span class="comment">// [esp+11Bh] [ebp-10Dh]</span></span><br><span class="line">    <span class="type">char</span> v13[<span class="number">260</span>]; <span class="comment">// [esp+124h] [ebp-104h]</span></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">256</span>; ++i)</span><br><span class="line">        v13[i] = i;</span><br><span class="line">    v7 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; <span class="number">256</span>; ++j)</span><br><span class="line">    &#123;</span><br><span class="line">        v7 = ((<span class="type">unsigned</span> __int8)key[j % key_len] + v7 + (<span class="type">unsigned</span> __int8)v13[j]) % <span class="number">256</span>;</span><br><span class="line">        v5 = v13[j];</span><br><span class="line">        v13[j] = v13[v7];</span><br><span class="line">        v13[v7] = v5;</span><br><span class="line">    &#125;</span><br><span class="line">    v12 = <span class="number">0</span>;</span><br><span class="line">    v11 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(k = <span class="number">0</span>; ; ++k)</span><br><span class="line">    &#123;</span><br><span class="line">        result = k;</span><br><span class="line">        <span class="keyword">if</span>(k &gt;= input_len)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        v11 += v13[++v12];</span><br><span class="line">        v6 = v13[v12];</span><br><span class="line">        v13[v12] = v13[v11];</span><br><span class="line">        v13[v11] = v6;</span><br><span class="line">        input[k] ^= v13[((<span class="type">unsigned</span> __int8)v13[v11] + (<span class="type">unsigned</span> __int8)v13[v12]) % <span class="number">256</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> enc_flag[] =</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="number">0x80</span>, <span class="number">0x05</span>, <span class="number">0xE3</span>, <span class="number">0x2F</span>, <span class="number">0x18</span>, <span class="number">0x2F</span>, <span class="number">0xC5</span>, <span class="number">0x8C</span>, <span class="number">0x25</span>, <span class="number">0x70</span>,</span><br><span class="line">        <span class="number">0xBC</span>, <span class="number">0x05</span>, <span class="number">0x1C</span>, <span class="number">0x4F</span>, <span class="number">0xF2</span>, <span class="number">0x02</span>, <span class="number">0xE5</span>, <span class="number">0x3E</span>, <span class="number">0x02</span>, <span class="number">0x2F</span>,</span><br><span class="line">        <span class="number">0xE5</span>, <span class="number">0x11</span>, <span class="number">0xA3</span>, <span class="number">0xC0</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">char</span> key[] = <span class="string">&quot;thisisyoursecretkey&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="built_in">rc4</span>(enc_flag, <span class="number">24</span>, key, <span class="number">18</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">24</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        enc_flag[i] = (enc_flag[i] &lt;&lt; <span class="number">2</span>) &amp; <span class="number">63</span> | (enc_flag[i] &gt;&gt; <span class="number">6</span>);</span><br><span class="line">        enc_flag[i] ^= <span class="number">0x7D</span>;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, enc_flag[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>RCTF{a_baby_debug_bloker}</p>
+</blockquote>
+<h2 id="PPTT"><a href="#PPTT" class="headerlink" title="PPTT"></a>PPTT</h2><p>看到mian函数中先将输入写成二叉树层序存储，然后先序和中序遍历，并对中序的结果进行交换混淆，</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/tree.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/mix.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>v23，v24，v25存储的即为中序遍历的结果，z3解方程可得</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/z3.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>z3解方程+还原：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> z3 <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">v17 = BitVec(<span class="string">&#x27;v17&#x27;</span>, <span class="number">64</span>)</span><br><span class="line">v18 = BitVec(<span class="string">&#x27;v18&#x27;</span>, <span class="number">64</span>)</span><br><span class="line">v19 = BitVec(<span class="string">&#x27;v19&#x27;</span>, <span class="number">64</span>)</span><br><span class="line">v20 = BitVec(<span class="string">&#x27;v20&#x27;</span>, <span class="number">64</span>)</span><br><span class="line">v23 = BitVec(<span class="string">&#x27;v23&#x27;</span>, <span class="number">64</span>)</span><br><span class="line">v24 = BitVec(<span class="string">&#x27;v24&#x27;</span>, <span class="number">64</span>)</span><br><span class="line">v25 = BitVec(<span class="string">&#x27;v25&#x27;</span>, <span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">s = Solver()</span><br><span class="line"></span><br><span class="line">s.add(v20 == v24 &amp; v23)</span><br><span class="line">s.add(v19 == (v24 &amp; v23 | v25 &amp; v23) + <span class="number">65670</span>)</span><br><span class="line">s.add(v18 == (v25 &amp; v23 ^ v25 &amp; v24) - <span class="number">1131796</span>)</span><br><span class="line">s.add(v17 == v24 &amp; v23 ^ v25 &amp; v23)</span><br><span class="line"><span class="comment"># s.add((v24 &amp; v23 &amp; (~(v24 | v23) | v25 &amp; v23 | v25 &amp; v24 &amp; ~v18) | v25 &amp; v24 &amp; v18) != 0x67437616)</span></span><br><span class="line">s.add((v23 ^ (v20 &amp; ~v18 | v20 &amp; ~v19 | v17 &amp; v19 | v25 &amp; v23 &amp; ~v18)) == <span class="number">0x400010000622000</span>)</span><br><span class="line">s.add((v18 ^ (v19 - v20)) == <span class="number">0x2100A0203EFBB8B</span>)</span><br><span class="line">s.add((v17 ^ v19 ^ v20) == <span class="number">0x4083102108E</span>)</span><br><span class="line">s.add((v19 ^ v17) - v18 == <span class="number">0x1551566F3C6485ED</span>)</span><br><span class="line">s.add((v18 ^ v19 ^ v25 &amp; v24) == <span class="number">0x40836ECAB9A</span>)</span><br><span class="line">s.add((v17 ^ v20) - v18 == <span class="number">0x3E51566F3C718563</span>)</span><br><span class="line">s.add(v23 - v24 == <span class="number">0x1AEFF6FDFC121BF1</span>)</span><br><span class="line">s.add((v25 + v24 + v23) % <span class="number">10</span> == <span class="number">8</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> s.check() == sat:</span><br><span class="line">    model = s.model()</span><br><span class="line">    tmp = long_to_bytes(model[v25].as_long())</span><br><span class="line">    s.add(v25 != model[v25])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(<span class="built_in">str</span>(tmp)) != <span class="number">11</span> <span class="keyword">or</span> tmp.find(<span class="string">b&#x27;C&#x27;</span>) == -<span class="number">1</span> <span class="keyword">or</span> tmp.find(<span class="string">b&#x27;F&#x27;</span>) == -<span class="number">1</span> <span class="keyword">or</span> tmp.find(<span class="string">b&#x27;&#125;&#x27;</span>) == -<span class="number">1</span>:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">    mid1 = long_to_bytes(model[v23].as_long())</span><br><span class="line">    mid2 = long_to_bytes(model[v24].as_long())</span><br><span class="line">    mid3 = long_to_bytes(model[v25].as_long())</span><br><span class="line">    <span class="comment"># print(mid1[::-1])</span></span><br><span class="line">    <span class="comment"># print(mid2[::-1])</span></span><br><span class="line">    <span class="comment"># print(mid3[::-1])</span></span><br><span class="line"></span><br><span class="line">    str1 = <span class="string">&#x27;0123456789abcdefghijklmn&#x27;</span></span><br><span class="line">    str2 = <span class="string">&#x27;gefckamb52hl48i0n1j396d7&#x27;</span></span><br><span class="line"></span><br><span class="line">    mid = mid1[::-<span class="number">1</span>]+mid2[::-<span class="number">1</span>]+mid3[::-<span class="number">1</span>]</span><br><span class="line">    flag = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">24</span>): </span><br><span class="line">        flag += <span class="built_in">chr</span>(mid[str2.find(str1[i])])</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(flag)</span><br></pre></td></tr></table></figure>
+
+<p>一个一个验证所有解</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/trytry.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/flag.png" alt="img" data-caption="img" loading="lazy"></p>
+<blockquote>
+<p>RCTF{sjknwemqspsdaqtyua}</p>
+</blockquote>
+<h1 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h1><h2 id="s1ayth3sp1re"><a href="#s1ayth3sp1re" class="headerlink" title="s1ayth3sp1re"></a>s1ayth3sp1re</h2><p>这应该是个re题。</p>
+<p>把文件拖进jadx查找判断胜利的条件：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/3000.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>直接看加密逻辑，简单异或：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/enc.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>写解密代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">arr1 = [<span class="number">164</span>, <span class="number">158</span>, <span class="number">95</span>, <span class="number">107</span>, <span class="number">4</span>, <span class="number">215</span>, <span class="number">108</span>, <span class="number">115</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">25</span>, <span class="number">57</span>, <span class="number">41</span>, <span class="number">236</span>, <span class="number">231</span>, <span class="number">17</span>, <span class="number">85</span>]</span><br><span class="line">arr2 = [<span class="number">246</span>, <span class="number">221</span>, <span class="number">11</span>, <span class="number">45</span>, <span class="number">127</span>, <span class="number">148</span>, <span class="number">45</span>, <span class="number">36</span>, <span class="number">70</span>, <span class="number">73</span>, <span class="number">78</span>, <span class="number">8</span>, <span class="number">98</span>, <span class="number">141</span>, <span class="number">140</span>, <span class="number">112</span>, <span class="number">40</span>]</span><br><span class="line"></span><br><span class="line">enc1 = [<span class="number">0</span>] * <span class="built_in">len</span>(arr1)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(arr1)):</span><br><span class="line">    enc1[i] = arr1[i] ^ arr2[i]</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(enc1[i]), end = <span class="string">&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>()</span><br><span class="line"></span><br><span class="line">arr3 = [<span class="number">100</span>, <span class="number">174</span>, <span class="number">197</span>, <span class="number">56</span>]</span><br><span class="line">arr4 = [<span class="number">2</span>, <span class="number">0xC2</span>, <span class="number">164</span>, <span class="number">95</span>]</span><br><span class="line"></span><br><span class="line">enc2 = [<span class="number">0</span>] * <span class="built_in">len</span>(arr3)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(arr3)):</span><br><span class="line">    enc2[i] = arr3[i] ^ arr4[i]</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(enc2[i]), end = <span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./RCTF2024/cawcaw1kaka.png" alt="img" data-caption="img" loading="lazy"></p>
+<blockquote>
+<p>RCTF{CAWCAW1Kaka}</p>
+</blockquote>
+
+    <p><img src="https://s2.loli.net/2024/04/14/jbJvEX1hxiCz7OR.jpg" loading="eager"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>Author：</strong>Pinguw<br>
+        <strong>Link：</strong><a href="http://example.com/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/" title="http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;05&#x2F;29&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;RCTF2024&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;05&#x2F;29&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;RCTF2024&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/WriteUp/" rel="tag">WriteUp</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1716987763686"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Reverse"><span class="toc-number">1.</span> <span class="toc-text">Reverse</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2048"><span class="toc-number">1.1.</span> <span class="toc-text">2048</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bloker-vm"><span class="toc-number">1.2.</span> <span class="toc-text">bloker_vm</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PPTT"><span class="toc-number">1.3.</span> <span class="toc-text">PPTT</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Misc"><span class="toc-number">2.</span> <span class="toc-text">Misc</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#s1ayth3sp1re"><span class="toc-number">2.1.</span> <span class="toc-text">s1ayth3sp1re</span></a></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="Search" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
