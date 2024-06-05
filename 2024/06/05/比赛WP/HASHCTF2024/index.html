@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en"><head>
+<title>HASHCTF2024 - Pinguw&#39;s Blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" type="image/png" />
+<meta name="description" content="校赛也是ak re了，总排名第二，一等奖+Reverse单项最佳。   一人干活，七人围观！主要逻辑在这里：     是个多线程代码，线程影响v3的取值和异或的对象，直接上代码： 1234567891011121314151617181920212223242526272829303132333435363738#include &lt;cstdio&gt;void dec(unsigned ch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HASHCTF2024">
+<meta property="og:url" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/index.html">
+<meta property="og:site_name" content="Pinguw&#39;s Blog">
+<meta property="og:description" content="校赛也是ak re了，总排名第二，一等奖+Reverse单项最佳。   一人干活，七人围观！主要逻辑在这里：     是个多线程代码，线程影响v3的取值和异或的对象，直接上代码： 1234567891011121314151617181920212223242526272829303132333435363738#include &lt;cstdio&gt;void dec(unsigned ch">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/hashctf.jpeg">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/8w1.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/8w2.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/8w3.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/HEYGAP.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/flower.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/code1.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/codeflag.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/Dragon1.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/Dragon2.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/Dragon3.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/Dragonflag.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/go1.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/go2.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/go3.png">
+<meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/goflag.png">
+<meta property="article:published_time" content="2024-06-05T07:47:44.000Z">
+<meta property="article:modified_time" content="2024-06-05T08:01:50.466Z">
+<meta property="article:author" content="Pinguw">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/hashctf.jpeg">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1717574756081">
+
+<link rel="stylesheet" href="/css/style.css?v=1717574756081">
+
+
+
+
+    
+        <link rel="stylesheet" href="/custom.css?v=1717574756081">
+    
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/lib/lax.min.js" async></script>
+
+
+<script async src="/js/app.js?v=1717574756081"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script> 
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.1.1"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(https://s2.loli.net/2024/04/14/EJTHkjYwI4dil9K.jpg)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="Pinguw"><img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="Pinguw">
+            <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw" alt="Pinguw">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>8</div>
+        <div><span>Tags</span>3</div>
+        <div><span>Categories</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archives.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/friends.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/donate.html" title="给我赞助">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                给我赞助
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/aboutme.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://space.bilibili.com/416333261"
+			target="_blank"
+			mdui-tooltip="{content: '哔哩哔哩'}"
+			style="
+				color: rgb(231, 106, 141);
+				background-color: rgba(231, 106, 141, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-bilibili"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/Pinguw"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/Reverse/">Reverse</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/比赛WP/">比赛WP</a>
+          <span class="category-list-count">3</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 10px;">Re分享</a> <a href="/tags/WriteUp/" style="font-size: 10px;">WriteUp</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 10px;">刷题记录</a>
+    </div>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Recent Posts</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/">HASHCTF2024</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/">RCTF2024部分题解</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/">CISCN2024-Reverse部分题解</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/13/%E6%AF%94%E8%B5%9BWP/H&NCTF2024/">H&amp;NCTF2024-Reverse部分题解</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/11/Reverse/Gate-of-Heaven/">敲响天堂之门</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+            <li>
+                <a href="https://Pinguw.github.io/" target="_blank" >
+                    <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></img>
+                    <p>Pinguw</p>
+                </a>
+            </li>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2024 Pinguw
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover"> 
+            <img src="https://s2.loli.net/2024/04/14/EJTHkjYwI4dil9K.jpg" alt="HASHCTF2024" loading="lazy">
+            <h1>HASHCTF2024</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2024年06月05日</a>
+        
+        
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>校赛也是ak re了，总排名第二，一等奖+Reverse单项最佳。</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/hashctf.jpeg" alt="44ac0afe31d3662f85503ad781a564a6" data-caption="44ac0afe31d3662f85503ad781a564a6" loading="lazy">
+
+<h2 id="一人干活，七人围观！"><a href="#一人干活，七人围观！" class="headerlink" title="一人干活，七人围观！"></a>一人干活，七人围观！</h2><p>主要逻辑在这里：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/8w1.png" alt="8w1" data-caption="8w1" loading="lazy">
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/8w2.png" alt="8w2" data-caption="8w2" loading="lazy">
+
+<p>是个多线程代码，线程影响v3的取值和异或的对象，直接上代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">dec</span><span class="params">(<span class="type">unsigned</span> <span class="type">char</span>* enc)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">char</span> key[] = <span class="string">&quot;HASH2024&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> round = <span class="number">1</span>; round &lt;= <span class="number">8</span>; round++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> count = <span class="number">8</span>; count &gt;= <span class="number">1</span>;)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">int</span> v4 = <span class="number">8</span> - count;</span><br><span class="line">            <span class="type">int</span> v3 = ((<span class="number">4</span> * round) | round) ^ key[<span class="number">8</span> - count--];</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++)</span><br><span class="line">                enc[v4 * <span class="number">8</span> + i] ^= v3;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">64</span>; i++)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, enc[i]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> enc_flag[] =</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="number">0x60</span>, <span class="number">0x69</span>, <span class="number">0x7B</span>, <span class="number">0x60</span>, <span class="number">0x6B</span>, <span class="number">0x7C</span>, <span class="number">0x6E</span>, <span class="number">0x53</span>, <span class="number">0x66</span>, <span class="number">0x18</span>,</span><br><span class="line">        <span class="number">0x5F</span>, <span class="number">0x77</span>, <span class="number">0x7D</span>, <span class="number">0x77</span>, <span class="number">0x40</span>, <span class="number">0x1C</span>, <span class="number">0x5E</span>, <span class="number">0x1B</span>, <span class="number">0x77</span>, <span class="number">0x1B</span>,</span><br><span class="line">        <span class="number">0x50</span>, <span class="number">0x58</span>, <span class="number">0x44</span>, <span class="number">0x18</span>, <span class="number">0x5A</span>, <span class="number">0x1B</span>, <span class="number">0x4C</span>, <span class="number">0x77</span>, <span class="number">0x1F</span>, <span class="number">0x40</span>,</span><br><span class="line">        <span class="number">0x1B</span>, <span class="number">0x77</span>, <span class="number">0x4B</span>, <span class="number">0x18</span>, <span class="number">0x46</span>, <span class="number">0x4B</span>, <span class="number">0x7D</span>, <span class="number">0x5A</span>, <span class="number">0x02</span>, <span class="number">0x1A</span>,</span><br><span class="line">        <span class="number">0x4D</span>, <span class="number">0x46</span>, <span class="number">0x4B</span>, <span class="number">0x51</span>, <span class="number">0x77</span>, <span class="number">0x18</span>, <span class="number">0x4E</span>, <span class="number">0x77</span>, <span class="number">0x1F</span>, <span class="number">0x40</span>,</span><br><span class="line">        <span class="number">0x1B</span>, <span class="number">0x77</span>, <span class="number">0x6B</span>, <span class="number">0x77</span>, <span class="number">0x44</span>, <span class="number">0x1C</span>, <span class="number">0x46</span>, <span class="number">0x4F</span>, <span class="number">0x5D</span>, <span class="number">0x1C</span>,</span><br><span class="line">        <span class="number">0x4F</span>, <span class="number">0x1B</span>, <span class="number">0x09</span>, <span class="number">0x55</span></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">dec</span>((<span class="type">unsigned</span> <span class="type">char</span>*)enc_flag);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/8w3.png" alt="8w3" data-caption="8w3" loading="lazy">
+
+<blockquote>
+<p>HASHCTF{N1w_U_h4v3_3xpl0r3d_7h3_c0ncUr*2ency_0f_7h3_c_l4ngu4g3!}</p>
+</blockquote>
+<p>解完之后想起来，既然加密是异或，大概率调试的时候把密文输入，那么最后判断时的结果就是flag，出题人的回答印证了我的猜想，不过是一血，没什么影响。</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/HEYGAP.png" alt="HEYGAP" data-caption="HEYGAP" loading="lazy">
+
+<h2 id="Teaflower"><a href="#Teaflower" class="headerlink" title="Teaflower"></a>Teaflower</h2><p>十分钟秒杀题。</p>
+<p>有壳去壳，有花去花，</p>
+<p>壳是简单的upx一键去，花是简单的跳转全nop，</p>
+<p>TEA的delta魔改了一下，直接写解密代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdio&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">decrypt</span> <span class="params">(<span class="type">uint32_t</span>* v, <span class="type">uint32_t</span>* k)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">uint32_t</span> v0 = v[<span class="number">0</span>], v1 = v[<span class="number">1</span>], sum = <span class="number">0xBABEEAEA</span> * <span class="number">32</span>;</span><br><span class="line">	<span class="type">uint32_t</span> delta = <span class="number">0xBABEEAEA</span>;</span><br><span class="line">	<span class="type">uint32_t</span> k0 = k[<span class="number">0</span>], k1 = k[<span class="number">1</span>], k2 = k[<span class="number">2</span>], k3 = k[<span class="number">3</span>];</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">32</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		v1 -= ((v0 &lt;&lt; <span class="number">4</span>) + k2) ^ (v0 + sum) ^ ((v0 &gt;&gt; <span class="number">5</span>) + k3);</span><br><span class="line">		v0 -= ((v1 &lt;&lt; <span class="number">4</span>) + k0) ^ (v1 + sum) ^ ((v1 &gt;&gt; <span class="number">5</span>) + k1);</span><br><span class="line">		sum -= delta;</span><br><span class="line">	&#125;</span><br><span class="line">	v[<span class="number">0</span>] = v0;</span><br><span class="line">	v[<span class="number">1</span>] = v1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> enc_flag[] =</span><br><span class="line">	&#123;</span><br><span class="line">	    <span class="number">0x32</span>, <span class="number">0x31</span>, <span class="number">0x75</span>, <span class="number">0x08</span>, <span class="number">0x27</span>, <span class="number">0x72</span>, <span class="number">0xD5</span>, <span class="number">0x62</span>, <span class="number">0xE9</span>, <span class="number">0x2C</span>,</span><br><span class="line">	    <span class="number">0xA5</span>, <span class="number">0xAE</span>, <span class="number">0x98</span>, <span class="number">0x03</span>, <span class="number">0x5E</span>, <span class="number">0x4F</span>, <span class="number">0xEB</span>, <span class="number">0x25</span>, <span class="number">0xC3</span>, <span class="number">0xAD</span>,</span><br><span class="line">	    <span class="number">0xBB</span>, <span class="number">0x25</span>, <span class="number">0x49</span>, <span class="number">0x7D</span>, <span class="number">0x88</span>, <span class="number">0xAE</span>, <span class="number">0x9C</span>, <span class="number">0x73</span>, <span class="number">0x21</span>, <span class="number">0x37</span>,</span><br><span class="line">	    <span class="number">0xAA</span>, <span class="number">0x4D</span>, <span class="number">0x77</span>, <span class="number">0xA1</span>, <span class="number">0xBA</span>, <span class="number">0x08</span>, <span class="number">0xE9</span>, <span class="number">0xBB</span>, <span class="number">0x28</span>, <span class="number">0x29</span>,</span><br><span class="line">	&#125;;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> key[<span class="number">32</span>] = <span class="string">&quot;HASH2024HASH2024&quot;</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">40</span>; i += <span class="number">8</span>)</span><br><span class="line">		<span class="built_in">decrypt</span>((<span class="type">unsigned</span> <span class="type">int</span>*)&amp;enc_flag[i], (<span class="type">unsigned</span> <span class="type">int</span>*)key);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">40</span>; i++)</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, enc_flag[i]);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/flower.png" alt="flower" data-caption="flower" loading="lazy">
+
+<blockquote>
+<p>HASHCTF{W0o0w_U_cAn_r3@11y_r3v3r53_14!!}</p>
+</blockquote>
+<h2 id="babycode"><a href="#babycode" class="headerlink" title="babycode"></a>babycode</h2><p>我忘了是怎么知道的以太坊虚拟机（大概是拷打GPT的时候它招的供词），找一个能把字节码还原成汇编的网站<a target="_blank" rel="noopener" href="https://ethervm.io/decompile%EF%BC%9A">https://ethervm.io/decompile：</a></p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/code1.png" alt="code1" data-caption="code1" loading="lazy">
+
+<p>发现有两处位置一直在push数据，将两块数据扒下来，后面还有XOR指令加上出题人提示，将两块数据异或，得到flag：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">data1 = [<span class="number">0x1b</span>, <span class="number">0x24</span>, <span class="number">0x30</span>, <span class="number">0x3d</span>, <span class="number">0x31</span>, <span class="number">0x31</span>, <span class="number">0x0d</span>, <span class="number">0x3e</span>, <span class="number">0x0a</span>, <span class="number">0x0a</span>, <span class="number">0x4f</span>, <span class="number">0x67</span>, <span class="number">0x3a</span>, <span class="number">0x09</span>, <span class="number">0x51</span>, <span class="number">0x30</span>, <span class="number">0x08</span>, <span class="number">0x13</span>, <span class="number">0x32</span>, <span class="number">0x2b</span>, <span class="number">0x0d</span>, <span class="number">0x26</span>, <span class="number">0x3c</span>, <span class="number">0x24</span>, <span class="number">0x30</span>, <span class="number">0x78</span>, <span class="number">0x27</span>, <span class="number">0x67</span>, <span class="number">0x19</span>, <span class="number">0x2d</span>, <span class="number">0x57</span>, <span class="number">0x46</span>, <span class="number">0x57</span>, <span class="number">0x46</span>, <span class="number">0x2c</span>, <span class="number">0x07</span>, <span class="number">0x7e</span>, <span class="number">0x10</span>, <span class="number">0x4e</span>]</span><br><span class="line">data2 = [<span class="number">0x53</span>, <span class="number">0x65</span>, <span class="number">0x63</span>, <span class="number">0x75</span>, <span class="number">0x72</span>, <span class="number">0x65</span>, <span class="number">0x4b</span>, <span class="number">0x45</span>, <span class="number">0x59</span>, <span class="number">0x3a</span>, <span class="number">0x20</span>, <span class="number">0x57</span>, <span class="number">0x65</span>, <span class="number">0x6c</span>, <span class="number">0x63</span>, <span class="number">0x6f</span>, <span class="number">0x6d</span>, <span class="number">0x65</span>, <span class="number">0x5f</span>, <span class="number">0x74</span>, <span class="number">0x6f</span>, <span class="number">0x5f</span>, <span class="number">0x48</span>, <span class="number">0x41</span>, <span class="number">0x53</span>, <span class="number">0x48</span>, <span class="number">0x43</span>, <span class="number">0x54</span>, <span class="number">0x46</span>, <span class="number">0x5f</span>, <span class="number">0x32</span>, <span class="number">0x30</span>, <span class="number">0x32</span>, <span class="number">0x34</span>, <span class="number">0x5f</span>, <span class="number">0x34</span>, <span class="number">0x5f</span>, <span class="number">0x31</span>, <span class="number">0x33</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data1)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(data1[i] ^ data2[i]), end = <span class="string">&#x27;&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/codeflag.png" alt="codeflag" data-caption="codeflag" loading="lazy">
+
+<blockquote>
+<p>HASHCTF{S0o0_e2_evm_bytec0d3_revers3!!}</p>
+</blockquote>
+<h2 id="高速龙车驾驶员"><a href="#高速龙车驾驶员" class="headerlink" title="高速龙车驾驶员"></a>高速龙车驾驶员</h2><p>直接运行报错需要支持库，走出题人不建议的路线loongarch交叉编译工具链<del>（因为建议的路我不会走）</del>，</p>
+<p>安装后里面有loongarch64-objdump，用他dump出文件的汇编代码和数据段：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/Dragon1.png" alt="Dragon1" data-caption="Dragon1" loading="lazy">
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/Dragon2.png" alt="Dragon2" data-caption="Dragon2" loading="lazy">
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/Dragon3.png" alt="Dragon3" data-caption="Dragon3" loading="lazy">
+
+<p>对照出题人给的文档，分析汇编：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">	sp -= 32</span><br><span class="line">	sp[8] = s1</span><br><span class="line">	sp[16] = s0</span><br><span class="line">	sp[24] = ra</span><br><span class="line">	a1 += 7612</span><br><span class="line">	t0 += 171</span><br><span class="line">	xr1 = a1</span><br><span class="line">	xr0 = a1[32]</span><br><span class="line">	t1 += 160</span><br><span class="line">	xr2 = t0</span><br><span class="line">	<span class="keyword">for</span> (int i = 0; i &lt; 4; i++)</span><br><span class="line">  		xr0 ^= xr2</span><br><span class="line">	xr0 = a1[32]</span><br><span class="line">	xr3 = t1</span><br><span class="line">	a0 = 8</span><br><span class="line">	a0 = 152</span><br><span class="line">	<span class="keyword">for</span> (int i = 0; i &lt; 4; i++)</span><br><span class="line">  		xr1 ^= xr3</span><br><span class="line">	a1[0] = xr1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>关键部分如上：异或加密。</p>
+<p>从扒出的数据段中做尝试，最终使出将data段与rodata段异或得到flag。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">data1 = [<span class="number">0x5e</span>, <span class="number">0x7f</span>, <span class="number">0xec</span>, <span class="number">0x4f</span>, <span class="number">0x32</span>, <span class="number">0x30</span>, <span class="number">0xbb</span>, <span class="number">0x6c</span>, <span class="number">0x6b</span>, <span class="number">0xd7</span>, <span class="number">0x69</span>, <span class="number">0x70</span>, <span class="number">0xd7</span>, <span class="number">0xba</span>, <span class="number">0x53</span>, <span class="number">0x37</span>]</span><br><span class="line">data2 = [<span class="number">0x80</span>, <span class="number">0Xef</span>, <span class="number">0X4c</span>, <span class="number">0X69</span>, <span class="number">0X92</span>, <span class="number">0X9c</span>, <span class="number">0X38</span>, <span class="number">0X91</span>, <span class="number">0X92</span>, <span class="number">0Xb6</span>, <span class="number">0X38</span>, <span class="number">0Xde</span>, <span class="number">0X28</span>, <span class="number">0X0e</span>, <span class="number">0Xcd</span>, <span class="number">0X63</span>]</span><br><span class="line">data3 = [<span class="number">0xcd</span>, <span class="number">0xa2</span>, <span class="number">0xc1</span>, <span class="number">0x23</span>, <span class="number">0xbd</span>, <span class="number">0x30</span>, <span class="number">0xf5</span>, <span class="number">0x3a</span>, <span class="number">0x26</span>, <span class="number">0x33</span>, <span class="number">0xda</span>, <span class="number">0xfc</span>, <span class="number">0xaf</span>, <span class="number">0xad</span>, <span class="number">0xfa</span>, <span class="number">0x2d</span>]</span><br><span class="line">data4 = [<span class="number">0x8d</span>, <span class="number">0x20</span>, <span class="number">0x54</span>, <span class="number">0x2b</span>, <span class="number">0x37</span>, <span class="number">0x91</span>, <span class="number">0x5e</span>, <span class="number">0xad</span>, <span class="number">0xd0</span>, <span class="number">0xf8</span>, <span class="number">0xb2</span>, <span class="number">0xe7</span>, <span class="number">0xea</span>, <span class="number">0xfe</span>, <span class="number">0xc1</span>, <span class="number">0xc7</span>]</span><br><span class="line"></span><br><span class="line">key1 = [<span class="number">0x16</span>, <span class="number">0x3e</span>, <span class="number">0xbf</span>, <span class="number">0x07</span>, <span class="number">0x71</span>, <span class="number">0x64</span>, <span class="number">0xfd</span>, <span class="number">0x17</span>, <span class="number">0x32</span>, <span class="number">0xb8</span>, <span class="number">0x1c</span>, <span class="number">0x2f</span>, <span class="number">0x88</span>, <span class="number">0xd1</span>, <span class="number">0x3d</span>, <span class="number">0x58</span>]</span><br><span class="line">key2 = [<span class="number">0xf7</span>, <span class="number">0xb0</span>, <span class="number">0x13</span>, <span class="number">0x36</span>, <span class="number">0xde</span>, <span class="number">0xf3</span>, <span class="number">0x08</span>, <span class="number">0xfe</span>, <span class="number">0xfd</span>, <span class="number">0x86</span>, <span class="number">0x57</span>, <span class="number">0xb1</span>, <span class="number">0x18</span>, <span class="number">0x60</span>, <span class="number">0xaa</span>, <span class="number">0x22</span>]</span><br><span class="line">key3 = [<span class="number">0xbf</span>, <span class="number">0xc1</span>, <span class="number">0xa9</span>, <span class="number">0x7c</span>, <span class="number">0xe2</span>, <span class="number">0x6f</span>, <span class="number">0xb9</span>, <span class="number">0x7b</span>, <span class="number">0x75</span>, <span class="number">0x6b</span>, <span class="number">0x85</span>, <span class="number">0xa3</span>, <span class="number">0xfc</span>, <span class="number">0xc2</span>, <span class="number">0xca</span>, <span class="number">0x42</span>]</span><br><span class="line">key4 = [<span class="number">0xe2</span>, <span class="number">0x10</span>, <span class="number">0x3b</span>, <span class="number">0x44</span>, <span class="number">0x07</span>, <span class="number">0xce</span>, <span class="number">0x01</span>, <span class="number">0xf2</span>, <span class="number">0x87</span>, <span class="number">0x9d</span>, <span class="number">0xde</span>, <span class="number">0x8b</span>, <span class="number">0xcb</span>, <span class="number">0xdf</span>, <span class="number">0xbc</span>, <span class="number">0xc7</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data1)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(data1[i] ^ key1[i]), end = <span class="string">&#x27;&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data1)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(data2[i] ^ key2[i]), end = <span class="string">&#x27;&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data1)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(data3[i] ^ key3[i]), end = <span class="string">&#x27;&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(data1)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(data4[i] ^ key4[i]), end = <span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/Dragonflag.png" alt="Dragonflag" data-caption="Dragonflag" loading="lazy">
+
+<blockquote>
+<p>HASHCTF{You__ know__ _ Lo0oo0oo0ngArch___ LASX_ _So0oo0oo0___Well!!}</p>
+</blockquote>
+<h2 id="xorust"><a href="#xorust" class="headerlink" title="xorust"></a>xorust</h2><p>简单恢复一下符号表：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/go1.png" alt="go1" data-caption="go1" loading="lazy">
+
+<p>在func函数中找到关键部分：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/go2.png" alt="go2" data-caption="go2" loading="lazy">
+
+<p>扒取数据：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/go3.png" alt="go3" data-caption="go3" loading="lazy">
+
+<p>发现这些数据比input少一位，试着在最前面加 <code> H</code>或者在最后面加 <code> &#125;</code>，</p>
+<p>写出解密代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">data = [<span class="number">0x09</span>, <span class="number">0x12</span>, <span class="number">0x1B</span>, <span class="number">0x0B</span>, <span class="number">0x17</span>, <span class="number">0x12</span>, <span class="number">0x3D</span>, <span class="number">0x2C</span>, <span class="number">0x32</span>, <span class="number">0x54</span>, <span class="number">0x52</span>, <span class="number">0x53</span>, <span class="number">0x5D</span>, <span class="number">0x08</span>, <span class="number">0x3A</span>, <span class="number">0x10</span>, <span class="number">0x3A</span>, <span class="number">0x07</span>, <span class="number">0x2D</span>, <span class="number">0x0D</span>, <span class="number">0x27</span>, <span class="number">0x06</span>, <span class="number">0x27</span>, <span class="number">0x0B</span>, <span class="number">0x12</span>, <span class="number">0x0D</span>, <span class="number">0x33</span>, <span class="number">0x07</span>, <span class="number">0x47</span>, <span class="number">0x41</span>, <span class="number">0x2D</span>, <span class="number">0x6B</span>, <span class="number">0x5B</span>, <span class="number">0x30</span>, <span class="number">0x15</span>, <span class="number">0x7A</span>, <span class="number">0x59</span>, <span class="number">0x07</span>, <span class="number">0x31</span>, <span class="number">0x2B</span>, <span class="number">0x3C</span>, <span class="number">0x2D</span>, <span class="number">0x26</span>, <span class="number">0x2C</span>, <span class="number">0x22</span>, <span class="number">0x3D</span>, <span class="number">0x0D</span>]</span><br><span class="line"></span><br><span class="line">data[<span class="number">0</span>] ^= <span class="built_in">ord</span>(<span class="string">&#x27;H&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;H&#x27;</span>, end = <span class="string">&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(data)):</span><br><span class="line">    data[i] ^= data[i - <span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> data:</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(i), end = <span class="string">&#x27;&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/goflag.png" alt="goflag" data-caption="goflag" loading="lazy">
+
+<blockquote>
+<p>HASHCTF{We1c0me_Our_RusT_M@st3r_4o_J0in_tHeCoMp}</p>
+</blockquote>
+
+    <p><img src="https://s2.loli.net/2024/04/14/jbJvEX1hxiCz7OR.jpg" loading="eager"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>Author：</strong>Pinguw<br>
+        <strong>Link：</strong><a href="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/" title="http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;06&#x2F;05&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;HASHCTF2024&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;06&#x2F;05&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;HASHCTF2024&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1717574756055"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BA%BA%E5%B9%B2%E6%B4%BB%EF%BC%8C%E4%B8%83%E4%BA%BA%E5%9B%B4%E8%A7%82%EF%BC%81"><span class="toc-number">1.</span> <span class="toc-text">一人干活，七人围观！</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Teaflower"><span class="toc-number">2.</span> <span class="toc-text">Teaflower</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#babycode"><span class="toc-number">3.</span> <span class="toc-text">babycode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E9%80%9F%E9%BE%99%E8%BD%A6%E9%A9%BE%E9%A9%B6%E5%91%98"><span class="toc-number">4.</span> <span class="toc-text">高速龙车驾驶员</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#xorust"><span class="toc-number">5.</span> <span class="toc-text">xorust</span></a></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="Search" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
