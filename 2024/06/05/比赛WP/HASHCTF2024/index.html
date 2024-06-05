@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/go3.png">
 <meta property="og:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/goflag.png">
 <meta property="article:published_time" content="2024-06-05T07:47:44.000Z">
-<meta property="article:modified_time" content="2024-06-05T08:08:45.198Z">
+<meta property="article:modified_time" content="2024-06-05T08:20:27.950Z">
 <meta property="article:author" content="Pinguw">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/HASHCTF2024/hashctf.jpeg">
@@ -39,15 +39,15 @@
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1717575220851">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1717575633714">
 
-<link rel="stylesheet" href="/css/style.css?v=1717575220851">
+<link rel="stylesheet" href="/css/style.css?v=1717575633714">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1717575220851">
+        <link rel="stylesheet" href="/custom.css?v=1717575633714">
     
 
 
@@ -57,7 +57,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1717575220851"></script>
+<script async src="/js/app.js?v=1717575633714"></script>
 
  
 
@@ -365,9 +365,12 @@
 <p>安装后里面有loongarch64-objdump，用他dump出文件的汇编代码和数据段：</p>
 <img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/Dragon1.png" alt="Dragon1" data-caption="Dragon1" loading="lazy">
 
+
 <img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/Dragon2.png" alt="Dragon2" data-caption="Dragon2" loading="lazy">
 
+
 <img onerror="imgOnError(this);" data-fancybox="gallery" src="./HASHCTF2024/Dragon3.png" alt="Dragon3" data-caption="Dragon3" loading="lazy">
+
 
 <p>对照出题人给的文档，分析汇编：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">	sp -= 32</span><br><span class="line">	sp[8] = s1</span><br><span class="line">	sp[16] = s0</span><br><span class="line">	sp[24] = ra</span><br><span class="line">	a1 += 7612</span><br><span class="line">	t0 += 171</span><br><span class="line">	xr1 = a1</span><br><span class="line">	xr0 = a1[32]</span><br><span class="line">	t1 += 160</span><br><span class="line">	xr2 = t0</span><br><span class="line">	<span class="keyword">for</span> (int i = 0; i &lt; 4; i++)</span><br><span class="line">  		xr0 ^= xr2</span><br><span class="line">	xr0 = a1[32]</span><br><span class="line">	xr3 = t1</span><br><span class="line">	a0 = 8</span><br><span class="line">	a0 = 152</span><br><span class="line">	<span class="keyword">for</span> (int i = 0; i &lt; 4; i++)</span><br><span class="line">  		xr1 ^= xr3</span><br><span class="line">	a1[0] = xr1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
@@ -424,7 +427,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1717575220824"></script>
+    <script async src="/js/copy-codeblock.js?v=1717575633688"></script>
   
 
   
