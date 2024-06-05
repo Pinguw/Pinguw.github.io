@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://s2.loli.net/2024/05/14/2xhD8P3b1AtkXQK.png">
 <meta property="og:image" content="https://s2.loli.net/2024/05/14/VtBCpFDviq4HuAT.png">
 <meta property="article:published_time" content="2024-05-13T15:48:29.000Z">
-<meta property="article:modified_time" content="2024-06-05T08:05:46.385Z">
+<meta property="article:modified_time" content="2024-06-05T08:08:38.011Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="WriteUp">
 <meta name="twitter:card" content="summary">
@@ -33,15 +33,15 @@
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1717574756101">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1717575220869">
 
-<link rel="stylesheet" href="/css/style.css?v=1717574756101">
+<link rel="stylesheet" href="/css/style.css?v=1717575220869">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1717574756101">
+        <link rel="stylesheet" href="/custom.css?v=1717575220869">
     
 
 
@@ -51,7 +51,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1717574756101"></script>
+<script async src="/js/app.js?v=1717575220869"></script>
 
  
 
@@ -317,7 +317,7 @@
 </div>
 
     <p>其他的re就没时间做了（我承认是我菜）</p>
-<img onerror="imgOnError(this);" data-fancybox="gallery" src="./H&NCTF2024/H&NCTF.png" alt="46e42db28d84ad7a6d6e4dbd2fe9884c" data-caption="46e42db28d84ad7a6d6e4dbd2fe9884c" loading="lazy">
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./H&NCTF2024/H&NCTF.png" alt="H&NCTF" data-caption="H&NCTF" loading="lazy">
 
 <h2 id="Baby-OBVBS"><a href="#Baby-OBVBS" class="headerlink" title="Baby_OBVBS"></a>Baby_OBVBS</h2><p>打开之后看见是VBS混淆，将混淆部分打印出来（base64内容部分略去）：</p>
 <figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">eAqi = <span class="string">&quot;59fc6b263c3d0fcbc331ade699e62d3473bbf85522d588e3423e6c751ca091528a3c0186e460483917192c14&quot;</span></span><br><span class="line">ANtg = <span class="string">&quot;baacc7ffa8232d28f814bb14c428798b&quot;</span></span><br><span class="line"><span class="keyword">Function</span> Base64Decode(base64EncodedString)</span><br><span class="line">    <span class="keyword">Dim</span> xml, elem</span><br><span class="line">    <span class="keyword">Set</span> xml = <span class="built_in">CreateObject</span>(<span class="string">&quot;MSXML2.DOMDocument&quot;</span>)</span><br><span class="line">    <span class="keyword">Set</span> elem = xml.createElement(<span class="string">&quot;tmp&quot;</span>)</span><br><span class="line">    elem.dataType = <span class="string">&quot;bin.base64&quot;</span> </span><br><span class="line">    elem.text = base64EncodedString </span><br><span class="line">    <span class="keyword">Dim</span> stream</span><br><span class="line">    <span class="keyword">Set</span> stream = <span class="built_in">CreateObject</span>(<span class="string">&quot;ADODB.Stream&quot;</span>)</span><br><span class="line">    stream.Type = <span class="number">1</span> <span class="comment">&#x27;Binary</span></span><br><span class="line">    stream.Open</span><br><span class="line">    stream.Write elem.nodeTypedValue </span><br><span class="line">    stream.Position = <span class="number">0</span></span><br><span class="line">    stream.Type = <span class="number">2</span> <span class="comment">&#x27;Text</span></span><br><span class="line">    stream.Charset = <span class="string">&quot;utf-8&quot;</span></span><br><span class="line">    Base64Decode = stream.ReadText</span><br><span class="line">    stream.Close</span><br><span class="line"><span class="keyword">End</span> <span class="keyword">Function</span></span><br><span class="line">nbbt=<span class="string">&quot;RnVuY3Rpb24gSW5pdGlhbGl6ZShzdHJQd2QpDQogICAgRGltIGJveCgyNTYpDQogICAgRGltIHRlbXBTd2FwDQogICAgRGltIGENCiAg&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(nbbt)</span><br><span class="line">NFqt=<span class="string">&quot;RnVuY3Rpb24gTXlmdW5jKHNZCBGdW5jdGlvbg==&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(NFqt)</span><br><span class="line">NsFw=<span class="string">&quot;RnVuY3Rpb24gRWNTYpDQogICAgICAgIGVuY3J5cHRlZERhdGEgPSBlbmNyeXB0ZWREYXRhICYgTENhc2UoUmlnaHQoIjAiICYgSGV4KHkpLCAyKSkNCiAgICBOZXh0DQogICAgRW5DcnlwdCA9IGVuY3J5cHRlZERhdGENCkVuZCBGdW5jdGlvbg==&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(NsFw)</span><br><span class="line">hYLu=<span class="string">&quot;bXNnYm94ICJEbyB5b3Uga28gImJ5ZSEi&quot;</span></span><br><span class="line"><span class="keyword">execute</span> base64Decode(hYLu)</span><br></pre></td></tr></table></figure>
@@ -387,7 +387,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1717574756057"></script>
+    <script async src="/js/copy-codeblock.js?v=1717575220826"></script>
   
 
   
