@@ -9,7 +9,7 @@
 <meta name="description" content="去OLLVM平坦化([SUCTF2019]hardCPP)用ida打开是这样   十分有十二分的平坦化痕迹， 上次强网杯遇到过，但是因为当时没装好环境，deflat.py跑不出来，遗憾放弃。 这次又碰见不想再回避，打开这个网址把脚本装下来，https:&#x2F;&#x2F;github.com&#x2F;Pure-T&#x2F;deflat，看readme，要先装一个angr库（这个库在做VM虚拟机类题，写解析器脚本的时候也会很有用，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="去OLLVM平坦化([SUCTF2019]hardCPP)">
-<meta property="og:url" content="http://example.com/2024/03/26/Reverse/LLVM/index.html">
+<meta property="og:url" content="http://pinguw.github.io/2024/03/26/Reverse/LLVM/index.html">
 <meta property="og:site_name" content="Pinguw&#39;s Blog">
 <meta property="og:description" content="去OLLVM平坦化([SUCTF2019]hardCPP)用ida打开是这样   十分有十二分的平坦化痕迹， 上次强网杯遇到过，但是因为当时没装好环境，deflat.py跑不出来，遗憾放弃。 这次又碰见不想再回避，打开这个网址把脚本装下来，https:&#x2F;&#x2F;github.com&#x2F;Pure-T&#x2F;deflat，看readme，要先装一个angr库（这个库在做VM虚拟机类题，写解析器脚本的时候也会很有用，">
 <meta property="og:locale" content="en_US">
@@ -45,15 +45,15 @@
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1720332756502">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1720333050085">
 
-<link rel="stylesheet" href="/css/style.css?v=1720332756502">
+<link rel="stylesheet" href="/css/style.css?v=1720333050085">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1720332756502">
+        <link rel="stylesheet" href="/custom.css?v=1720333050085">
     
 
 
@@ -63,7 +63,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1720332756502"></script>
+<script async src="/js/app.js?v=1720333050085"></script>
 
  
 
@@ -334,14 +334,14 @@
 <p>十分有十二分的平坦化痕迹，</p>
 <p>上次强网杯遇到过，但是因为当时没装好环境，<code>deflat.py</code>跑不出来，遗憾放弃。</p>
 <p>这次又碰见不想再回避，打开这个网址把脚本装下来，<a target="_blank" rel="noopener" href="https://github.com/Pure-T/deflat">https://github.com/Pure-T/deflat</a>，看readme，要先装一个angr库（这个库在做VM虚拟机类题，写解析器脚本的时候也会很有用，<del>以后可能再写</del>）</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">pip install angr<br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip install angr<br></code></pre></td></tr></table></figure>
 
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/MszWToKn4hx7VA8.png" alt="Untitled _4_.png" data-caption="Untitled _4_.png" loading="lazy">	</p>
 <p>下载时间可能会有点长，</p>
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/oOHTGWNFDlzu9rB.png" alt="Untitled _5_.png" data-caption="Untitled _5_.png" loading="lazy"></p>
 <p>官方说的是用8.19.4.5版本，实际较新版本依然可用，</p>
 <p>装好后用以下指令去平坦化：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp 0x4007E0   <br><span class="hljs-comment">#python + deflat.py + 文件名 + 起始地址(基本就是main函数的地址)</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp 0x4007E0   <br><span class="hljs-comment">#python + deflat.py + 文件名 + 起始地址(基本就是main函数的地址)</span><br></code></pre></td></tr></table></figure>
 
 <p>然而出错：</p>
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/c9yN7jMaCK6VkeT.png" alt="Untitled _7_.png" data-caption="Untitled _7_.png" loading="lazy"></p>
@@ -350,7 +350,7 @@
 <p><strong>下载那个graph.py然后改名为<code>am_graph.py</code> ，将其与deflat.py放在同一目录下，</strong></p>
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/acvgJdOleLrQpwT.png" alt="Untitled _8_.png" data-caption="Untitled _8_.png" loading="lazy"></p>
 <p>再次运行相同命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp 0x4007E0   <br><span class="hljs-comment">#python + deflat.py + 文件名 + 起始地址(基本就是main函数的地址)</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp 0x4007E0   <br><span class="hljs-comment">#python + deflat.py + 文件名 + 起始地址(基本就是main函数的地址)</span><br></code></pre></td></tr></table></figure>
 
 <h3 id="期间可能会出现大量类似警告："><a href="#期间可能会出现大量类似警告：" class="headerlink" title="期间可能会出现大量类似警告："></a>期间可能会出现大量类似警告：</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/ZYJeHIWoXS4E9cm.png" alt="Untitled _9_.png" data-caption="Untitled _9_.png" loading="lazy"></p>
 <h3 id="不要害怕，只要最后是这样就好："><a href="#不要害怕，只要最后是这样就好：" class="headerlink" title="不要害怕，只要最后是这样就好："></a><strong>不要害怕</strong>，只要最后是这样就好：</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/SBeTcfgjsMvd3pX.png" alt="Untitled _10_.png" data-caption="Untitled _10_.png" loading="lazy"></p>
@@ -365,17 +365,17 @@
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/GAkyzJmw2q8ZsOY.png" alt="Untitled _14_.png" data-caption="Untitled _14_.png" loading="lazy"></p>
 <p>看到这一坨函数不要怕，其实就是c++里面的奇奇怪怪的东西（好像叫lambda表达式），来看看他们到底是干嘛的，</p>
 <p><strong>在对各函数分析的过程中发现在0x401310、0x4014E0和0x4016C0依然有平坦化，再跑脚本去一下，</strong></p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp_recovered 0x401310<br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp_recovered 0x401310<br></code></pre></td></tr></table></figure>
 
 <p>0x401310：</p>
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/beSXmYlECnAZ8HU.png" alt="Untitled _15_.png" data-caption="Untitled _15_.png" loading="lazy"></p>
 <p>再跑一遍</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp_recovered_recovered 0x4016C0<br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp_recovered_recovered 0x4016C0<br></code></pre></td></tr></table></figure>
 
 <p>0x4016C0：</p>
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/gXdvlj8czqEMStw.png" alt="Untitled _16_.png" data-caption="Untitled _16_.png" loading="lazy"></p>
 <p>再跑一遍：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp_recovered_recovered_recovered 0x4014E0<br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">python deflat.py hardCpp_recovered_recovered_recovered 0x4014E0<br></code></pre></td></tr></table></figure>
 
 <p>0x4014E0：</p>
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/FMNu7zWKV9PySQ1.png" alt="Untitled _17_.png" data-caption="Untitled _17_.png" loading="lazy"></p>
@@ -386,7 +386,7 @@
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/Vb5QR8XhIglcMu6.png" alt="Untitled _18_.png" data-caption="Untitled _18_.png" loading="lazy"></p>
 <p>是不是已经非常清晰了！</p>
 <p>整理一下：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs python">v18 = (<span class="hljs-number">3</span> * (<span class="hljs-number">18</span> ^ <span class="hljs-built_in">input</span>[i - <span class="hljs-number">1</span> + v21]) + <span class="hljs-number">2</span>) ^ ((v21 ^ <span class="hljs-built_in">input</span>[i]) + (<span class="hljs-built_in">input</span>[i - <span class="hljs-number">1</span> + v21] % <span class="hljs-number">7</span>))<br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">v18 = (<span class="hljs-number">3</span> * (<span class="hljs-number">18</span> ^ <span class="hljs-built_in">input</span>[i - <span class="hljs-number">1</span> + v21]) + <span class="hljs-number">2</span>) ^ ((v21 ^ <span class="hljs-built_in">input</span>[i]) + (<span class="hljs-built_in">input</span>[i - <span class="hljs-number">1</span> + v21] % <span class="hljs-number">7</span>))<br></code></pre></td></tr></table></figure>
 
 <p>从前面看出：v21大概是0 <del>（真的是大概，当时我也不太确定）</del></p>
 <p>然后等式左边的v18就是enc[i]那么这个算法显然可逆：</p>
@@ -395,7 +395,7 @@
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/ME43SXsTbNRL5tG.png" alt="Untitled _20_.png" data-caption="Untitled _20_.png" loading="lazy"></p>
 <p>那么flag（input）的第一位是<code>‘#’</code></p>
 <p>好了可以写解密代码了：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><code class="hljs python">enc = [<span class="hljs-number">0xF3</span>, <span class="hljs-number">0x2E</span>, <span class="hljs-number">0x18</span>, <span class="hljs-number">0x36</span>, <span class="hljs-number">0xE1</span>, <span class="hljs-number">0x4C</span>, <span class="hljs-number">0x22</span>, <span class="hljs-number">0xD1</span>, <span class="hljs-number">0xF9</span>, <span class="hljs-number">0x8C</span>, <span class="hljs-number">0x40</span>, <span class="hljs-number">0x76</span>, <span class="hljs-number">0xF4</span>, <span class="hljs-number">0x0E</span>, <span class="hljs-number">0x00</span>, <span class="hljs-number">0x05</span>, <span class="hljs-number">0xA3</span>, <span class="hljs-number">0x90</span>, <span class="hljs-number">0x0E</span>, <span class="hljs-number">0xA5</span>]<br><br><span class="hljs-built_in">input</span> = <span class="hljs-string">&#x27;#&#x27;</span><br><br>k = <span class="hljs-built_in">len</span>(<span class="hljs-built_in">input</span>)<br><br><span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(enc)):<br>    <span class="hljs-built_in">input</span> += <span class="hljs-built_in">chr</span>(((enc[j] ^ ((<span class="hljs-built_in">ord</span>(<span class="hljs-built_in">input</span>[j]) ^ <span class="hljs-number">18</span>) * <span class="hljs-number">3</span> + <span class="hljs-number">2</span>)) - (<span class="hljs-built_in">ord</span>(<span class="hljs-built_in">input</span>[j]) % <span class="hljs-number">7</span>)) &amp; <span class="hljs-number">0xff</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">input</span>)<br></code></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python">enc = [<span class="hljs-number">0xF3</span>, <span class="hljs-number">0x2E</span>, <span class="hljs-number">0x18</span>, <span class="hljs-number">0x36</span>, <span class="hljs-number">0xE1</span>, <span class="hljs-number">0x4C</span>, <span class="hljs-number">0x22</span>, <span class="hljs-number">0xD1</span>, <span class="hljs-number">0xF9</span>, <span class="hljs-number">0x8C</span>, <span class="hljs-number">0x40</span>, <span class="hljs-number">0x76</span>, <span class="hljs-number">0xF4</span>, <span class="hljs-number">0x0E</span>, <span class="hljs-number">0x00</span>, <span class="hljs-number">0x05</span>, <span class="hljs-number">0xA3</span>, <span class="hljs-number">0x90</span>, <span class="hljs-number">0x0E</span>, <span class="hljs-number">0xA5</span>]<br><br><span class="hljs-built_in">input</span> = <span class="hljs-string">&#x27;#&#x27;</span><br><br>k = <span class="hljs-built_in">len</span>(<span class="hljs-built_in">input</span>)<br><br><span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(enc)):<br>    <span class="hljs-built_in">input</span> += <span class="hljs-built_in">chr</span>(((enc[j] ^ ((<span class="hljs-built_in">ord</span>(<span class="hljs-built_in">input</span>[j]) ^ <span class="hljs-number">18</span>) * <span class="hljs-number">3</span> + <span class="hljs-number">2</span>)) - (<span class="hljs-built_in">ord</span>(<span class="hljs-built_in">input</span>[j]) % <span class="hljs-number">7</span>)) &amp; <span class="hljs-number">0xff</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">input</span>)<br></code></pre></td></tr></table></figure>
 
 <p>flag：</p>
 <p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://s2.loli.net/2024/04/11/mdvn8rOCXcJK34G.png" alt="Untitled _21_.png" data-caption="Untitled _21_.png" loading="lazy"></p>
@@ -411,7 +411,7 @@
       
     <div class="nexmoe-post-copyright">
         <strong>Author：</strong>Pinguw<br>
-        <strong>Link：</strong><a href="http://example.com/2024/03/26/Reverse/LLVM/" title="http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;03&#x2F;26&#x2F;Reverse&#x2F;LLVM&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;example.com&#x2F;2024&#x2F;03&#x2F;26&#x2F;Reverse&#x2F;LLVM&#x2F;</a><br>
+        <strong>Link：</strong><a href="http://pinguw.github.io/2024/03/26/Reverse/LLVM/" title="http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;03&#x2F;26&#x2F;Reverse&#x2F;LLVM&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;03&#x2F;26&#x2F;Reverse&#x2F;LLVM&#x2F;</a><br>
         
             <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
 
@@ -429,7 +429,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1720332756454"></script>
+    <script async src="/js/copy-codeblock.js?v=1720333050034"></script>
   
 
   
