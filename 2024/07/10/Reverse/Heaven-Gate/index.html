@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en"><head>
+<title>敲响天堂之门 - Pinguw&#39;s Blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" type="image/png" />
+<meta name="description" content="“天堂之门”介绍：天堂之门技术（Heaven’s Gate）是依靠操作系统提供的在不同位数CPU进行跨架构的指令调用（SysWoW64），这使得32位和64位的指令环境可以放在同一个程序中，但是目前的调试器包括IDA在内很少有能跨架构调试的，这使得调试器的调试不能正常进行。  一个在动态调试层面恐怕是最有难度的逆向反调试  架构之间的切换：首先我们要知道32位寄存器cs的值是0x23，64位cs寄">
+<meta property="og:type" content="article">
+<meta property="og:title" content="敲响天堂之门">
+<meta property="og:url" content="http://pinguw.github.io/2024/07/10/Reverse/Heaven-Gate/index.html">
+<meta property="og:site_name" content="Pinguw&#39;s Blog">
+<meta property="og:description" content="“天堂之门”介绍：天堂之门技术（Heaven’s Gate）是依靠操作系统提供的在不同位数CPU进行跨架构的指令调用（SysWoW64），这使得32位和64位的指令环境可以放在同一个程序中，但是目前的调试器包括IDA在内很少有能跨架构调试的，这使得调试器的调试不能正常进行。  一个在动态调试层面恐怕是最有难度的逆向反调试  架构之间的切换：首先我们要知道32位寄存器cs的值是0x23，64位cs寄">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710162021732.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710162620065.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710163010075.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710164249703.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710164805201.png">
+<meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710171556802.png">
+<meta property="article:published_time" content="2024-07-10T09:54:38.000Z">
+<meta property="article:modified_time" content="2024-07-10T09:55:37.144Z">
+<meta property="article:author" content="Pinguw">
+<meta property="article:tag" content="Re分享">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710162021732.png">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1720605372193">
+
+<link rel="stylesheet" href="/css/style.css?v=1720605372193">
+
+
+
+
+    
+        <link rel="stylesheet" href="/custom.css?v=1720605372193">
+    
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/lib/lax.min.js" async></script>
+
+
+<script async src="/js/app.js?v=1720605372194"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script> 
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.1.1"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(https://s2.loli.net/2024/04/14/EJTHkjYwI4dil9K.jpg)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="Pinguw"><img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="Pinguw">
+            <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw" alt="Pinguw">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>8</div>
+        <div><span>Tags</span>3</div>
+        <div><span>Categories</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archives.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/friends.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/donate.html" title="给我赞助">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                给我赞助
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/aboutme.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://space.bilibili.com/416333261"
+			target="_blank"
+			mdui-tooltip="{content: '哔哩哔哩'}"
+			style="
+				color: rgb(231, 106, 141);
+				background-color: rgba(231, 106, 141, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-bilibili"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/Pinguw"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/Reverse/">Reverse</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/比赛WP/">比赛WP</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 10px;">Re分享</a> <a href="/tags/WriteUp/" style="font-size: 20px;">WriteUp</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 10px;">刷题记录</a>
+    </div>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Recent Posts</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/07/10/Reverse/Heaven-Gate/">敲响天堂之门</a>
+          </li>
+        
+          <li>
+            <a href="/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/">HASHCTF2024-Reverse题解</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/">RCTF2024部分题解</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/">CISCN2024-Reverse部分题解</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/13/%E6%AF%94%E8%B5%9BWP/H&NCTF2024/">H&amp;NCTF2024-Reverse部分题解</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+            <li>
+                <a href="https://Pinguw.github.io/" target="_blank" >
+                    <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></img>
+                    <p>Pinguw</p>
+                </a>
+            </li>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2024 Pinguw
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 54.285714285714285%;"> 
+            <img src="https://s2.loli.net/2024/04/11/y7I9ETsqldZACeN.webp" alt="敲响天堂之门" loading="lazy">
+            <h1>敲响天堂之门</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2024年07月10日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/Reverse/">Reverse</a>
+        
+        
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h2 id="“天堂之门”介绍："><a href="#“天堂之门”介绍：" class="headerlink" title="“天堂之门”介绍："></a>“天堂之门”介绍：</h2><p>天堂之门技术（Heaven’s Gate）是依靠操作系统提供的在不同位数CPU进行跨架构的指令调用（SysWoW64），这使得32位和64位的指令环境可以放在同一个程序中，但是目前的调试器包括IDA在内很少有能跨架构调试的，这使得调试器的调试不能正常进行。</p>
+<blockquote>
+<p>一个在动态调试层面恐怕是最有难度的逆向反调试</p>
+</blockquote>
+<h2 id="架构之间的切换："><a href="#架构之间的切换：" class="headerlink" title="架构之间的切换："></a>架构之间的切换：</h2><p>首先我们要知道32位寄存器cs的值是0x23，64位cs寄存器的值是0x33，我们将cs的值在这两者间切换，便达到了跨架构运行程序的目的。</p>
+<p>那么我们如何更改寄存器cs的值呢？<br>我们知道，mov指令是无法直接改变cs寄存器的值的，需要借助<code> call</code>和<code> retf</code>来实现cs段的切换</p>
+<p><code>call far</code>和<code>retf(ret far)</code>是可以同时改变cs和ip的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">push 0x33				;0x33作为cs的新值<br>call $+5				;下一条指令的地址入栈<br>add dword [esp], 5		;+5后即是指向retf的下一条指令<br>retf 					;跳转到下一条指令，同时pop is和pop cs<br></code></pre></td></tr></table></figure>
+
+<p>或者使用<code>ljmp(jmp far)</code>（仅在32位到64位时）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs assembly">jmp far 33:地址<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>此外还有一种方式，在后面实现中将会提到；</p>
+</blockquote>
+<p>这样就实现了将cs改为0x33的功能，即从32位跳转到64位。</p>
+<p>对应的从64位跳转到32位的指令是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">call $+5<br>mov dword [rsp + 4], 0x23<br>add dword [rsp], 0xD<br>retf<br></code></pre></td></tr></table></figure>
+
+<p><strong>天堂之门的实现建立在对cs的更改可以让程序在32位和64之间切换的基础上。</strong></p>
+<p>MSVC实现（Intel格式），推荐使用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c++">_asm<br>&#123;<br>    _emit <span class="hljs-number">0x6A</span>      <span class="hljs-comment">// push 0x33</span><br>    _emit <span class="hljs-number">0x33</span><br><br>    _emit <span class="hljs-number">0xE8</span>      <span class="hljs-comment">// call $+5</span><br>    _emit <span class="hljs-number">0x00</span><br>    _emit <span class="hljs-number">0x00</span><br>    _emit <span class="hljs-number">0x00</span><br>    _emit <span class="hljs-number">0x00</span><br><br>    _emit <span class="hljs-number">0x83</span>      <span class="hljs-comment">// add dword [esp], 5</span><br>    _emit <span class="hljs-number">0x04</span><br>    _emit <span class="hljs-number">0x24</span><br>    _emit <span class="hljs-number">0x05</span><br><br>    _emit <span class="hljs-number">0xCB</span>      <span class="hljs-comment">// retf</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>GCC实现（AT&amp;T格式），不推荐用：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs C++">__asm__ (<br>	<span class="hljs-string">&quot;.byte 0x6A\n\t&quot;</span>      <span class="hljs-comment">// push 0x33</span><br>	<span class="hljs-string">&quot;.byte 0x33\n\t&quot;</span><br>	<br>    <span class="hljs-string">&quot;.byte 0xE8\n\t&quot;</span>      <span class="hljs-comment">// call $+5</span><br>    <span class="hljs-string">&quot;.byte 0x00\n\t&quot;</span><br>	<span class="hljs-string">&quot;.byte 0x00\n\t&quot;</span><br>	<span class="hljs-string">&quot;.byte 0x00\n\t&quot;</span><br>	<span class="hljs-string">&quot;.byte 0x00\n\t&quot;</span><br>	<br>	<span class="hljs-string">&quot;.byte 0x83\n\t&quot;</span><br>    <span class="hljs-string">&quot;.byte 0x04\n\t&quot;</span><br>    <span class="hljs-string">&quot;.byte 0x24\n\t&quot;</span><br>    <span class="hljs-string">&quot;.byte 0x05\n\t&quot;</span>      <span class="hljs-comment">// add dword [esp], 5</span><br>    <br>    <span class="hljs-string">&quot;.byte 0xCB\n\t&quot;</span>      <span class="hljs-comment">// retf</span><br>    );<br></code></pre></td></tr></table></figure>
+
+<h2 id="实现示例"><a href="#实现示例" class="headerlink" title="实现示例"></a>实现示例</h2><p>前面只介绍了对cs的更改，即cpu架构的切换，但是在我们的exe编译完成后，汇编的架构已经确定（32位），我们需要另嵌入64位的opcode到源代码中，然后让天堂之门的入口指向我们的x64_opcode才可正常执行。</p>
+<p>下面给出一个简单的示例：</p>
+<h3 id="环境配置："><a href="#环境配置：" class="headerlink" title="环境配置："></a>环境配置：</h3><ul>
+<li><p>VSMicrosoft Visual C++ v.14 - 2015；</p>
+</li>
+<li><p>ida64+32；</p>
+</li>
+<li><p>Release版本；</p>
+</li>
+<li><p>x86和x64编译器结合使用；</p>
+</li>
+<li><p>更改VS设置：</p>
+<blockquote>
+<p>项目-项目属性中更改以下设置：</p>
+<p>关闭随机基址：</p>
+<ul>
+<li>链接器-高级-随机基址：<strong>否</strong></li>
+</ul>
+<p>保留未引用的函数&#x2F;数据：</p>
+<ul>
+<li><p>链接器-常规-启用增量链接：<strong>否</strong></p>
+</li>
+<li><p>链接器-链接时间代码生成：**&#x2F;LTCG<strong>；引用：</strong>否**</p>
+</li>
+</ul>
+<p>关闭其他优化：</p>
+<ul>
+<li>C&#x2F;C++-优化-优化：<strong>已禁用</strong></li>
+<li>C&#x2F;C++-代码生成-运行库：<strong>多线程（&#x2F;MT）</strong></li>
+<li>C&#x2F;C++-调用约定：**__fastcall**</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<h3 id="代码实现："><a href="#代码实现：" class="headerlink" title="代码实现："></a>代码实现：</h3><ol>
+<li><p>用x64编译器编写一个简单的加密：</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> __fastcall <span class="hljs-title">XOR</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; a)</span>			<span class="hljs-comment">// 统一使用__fastcall调用约定，方便传参</span></span><br><span class="hljs-function"></span>&#123;<br>	a += <span class="hljs-number">2</span>;<br>	a ^= <span class="hljs-number">0x20</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>	<span class="hljs-type">int</span> a = <span class="hljs-number">0x30</span>;<br><br>	<span class="hljs-built_in">XOR</span>(a);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p> 将编译出的exe放进ida64中扒出XOR函数的opcode：</p>
+<p> <img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710162021732.png" alt="image-20240710162021732" data-caption="image-20240710162021732" loading="lazy"></p>
+<p> shift+E，提取出opcode</p>
+</li>
+<li><p>将代码中的XOR函数用opcode替换，main函数不作改动，用x86编译器编译运行，再次放入ida（此时运行会出错，正常现象）。</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> __fastcall <span class="hljs-title">XOR</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; a)</span></span><br><span class="hljs-function"></span>&#123;<br>	__asm &#123;<br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xc0</span><br>        _emit <span class="hljs-number">0x2</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xf0</span><br>        _emit <span class="hljs-number">0x20</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0xc3</span><br>	&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>	<span class="hljs-type">int</span> a = <span class="hljs-number">0x30</span>;<br><br>	<span class="hljs-built_in">XOR</span>(a);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p> 记录下这个32位程序的传参过程和opcode的起始地址，<strong>注意整个函数的起始地址根我们的opcode的起始地址不同</strong></p>
+<p> <img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710162620065.png" alt="image-20240710162620065" data-caption="image-20240710162620065" loading="lazy"></p>
+<p> <img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710163010075.png" alt="image-20240710163010075" data-caption="image-20240710163010075" loading="lazy"></p>
+</li>
+<li><p>删去直接调用XOR的语句，使用jmp far进门，并提前push好返回地址（<strong>预留</strong>），再使用retf出门，其他部分不变。</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;windows.h&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> __fastcall <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; a)</span></span><br><span class="hljs-function"></span>&#123;<br>    __asm &#123;<br>        _emit <span class="hljs-number">0x48</span>                  <span class="hljs-comment">//    &lt;---- address: 40108A</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xc0</span><br>        _emit <span class="hljs-number">0x2</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xf0</span><br>        _emit <span class="hljs-number">0x22</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0xc3</span><br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">int</span> a = <span class="hljs-number">0x30</span>;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0x8D</span>      <span class="hljs-comment">// lea ecx, [ebp + a]    ; a</span><br>        _emit <span class="hljs-number">0x4D</span><br>        _emit <span class="hljs-number">0xF8</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0x68</span>      <span class="hljs-comment">// push 00000000	因为64的retn弹出8字节，而32位下的push只入栈4字节，需要手动多push 4字节的填充</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x68</span>      <span class="hljs-comment">// push ********	预留好的返回地址</span><br>        _emit <span class="hljs-number">0xAB</span><br>        _emit <span class="hljs-number">0xCD</span><br>        _emit <span class="hljs-number">0xEF</span><br>        _emit <span class="hljs-number">0xAB</span><br><br>        _emit <span class="hljs-number">0xEA</span>      <span class="hljs-comment">// ljmp 0x33, 40108A (x64_opcode初地址)</span><br>        _emit <span class="hljs-number">0x8A</span><br>        _emit <span class="hljs-number">0x10</span><br>        _emit <span class="hljs-number">0x40</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x33</span><br>        _emit <span class="hljs-number">0x00</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0xE8</span>      <span class="hljs-comment">// call $+5</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0xC7</span>      <span class="hljs-comment">// mov dword [rsp + 4], 0x23</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x23</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x83</span>      <span class="hljs-comment">// add dword [rsp], 0xD</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x0D</span><br><br>        _emit <span class="hljs-number">0xCB</span>      <span class="hljs-comment">// retf</span><br>    &#125;<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p> 32位编译后再次放进ida中，找到我们需要的返回地址，ida对jmp far的分析有误，不用在意</p>
+<p> <img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710164249703.png" alt="image-20240710164249703" data-caption="image-20240710164249703" loading="lazy"></p>
+<p> <strong>注意这里变量a在内存中的地址改变了，我们也需要更改</strong></p>
+</li>
+<li><p>完整代码：</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> __fastcall <span class="hljs-title">XOR</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; a)</span></span><br><span class="hljs-function"></span>&#123;<br>	__asm &#123;<br>        _emit <span class="hljs-number">0x48</span>      <span class="hljs-comment">//                  &lt;--- address: 40108A</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xc0</span><br>        _emit <span class="hljs-number">0x2</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xf0</span><br>        _emit <span class="hljs-number">0x20</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0xc3</span><br>	&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>	<span class="hljs-type">int</span> a = <span class="hljs-number">0x30</span>;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0x8D</span>      <span class="hljs-comment">// lea ecx, [ebp + a]    ; a</span><br>        _emit <span class="hljs-number">0x4D</span><br>        _emit <span class="hljs-number">0xFC</span>  <span class="hljs-comment">//     &lt;--- 注意更改传参</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0x68</span>      <span class="hljs-comment">// push 00000000	因为64的retn弹出8字节，而32位下的push只入栈4字节，需要手动多push 4字节的填充</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x68</span>      <span class="hljs-comment">// push 4010E2	预留好的返回地址，指向jmp far后的第一条指令</span><br>        _emit <span class="hljs-number">0xE2</span><br>        _emit <span class="hljs-number">0x10</span><br>        _emit <span class="hljs-number">0x40</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0xEA</span>      <span class="hljs-comment">// ljmp 0x33, 40108A (x64_opcode初地址)</span><br>        _emit <span class="hljs-number">0x8A</span><br>        _emit <span class="hljs-number">0x10</span><br>        _emit <span class="hljs-number">0x40</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x33</span><br>        _emit <span class="hljs-number">0x00</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0xE8</span>      <span class="hljs-comment">// call $+5                 &lt;--- address: 4010E2</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0xC7</span>      <span class="hljs-comment">// mov dword [rsp + 4], 0x23</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x23</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x83</span>      <span class="hljs-comment">// add dword [rsp], 0xD</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x0D</span><br><br>        _emit <span class="hljs-number">0xCB</span>      <span class="hljs-comment">// retf</span><br>    &#125;<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p> 运行验证结果：</p>
+<p> <img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710164805201.png" alt="image-20240710164805201" data-caption="image-20240710164805201" loading="lazy"></p>
+</li>
+</ol>
+<h2 id="其他实现"><a href="#其他实现" class="headerlink" title="其他实现"></a>其他实现</h2><p>上面是使用了jmp far进门方式，下面介绍另外两种进门方式：</p>
+<ul>
+<li><p>利用call far进门</p>
+  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> __fastcall <span class="hljs-title">XOR</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; a)</span></span><br><span class="hljs-function"></span>&#123;<br>    __asm &#123;<br>        _emit <span class="hljs-number">0xC6</span>      <span class="hljs-comment">//                  &lt;--- address: 40108A</span><br>        _emit <span class="hljs-number">0x44</span>      <span class="hljs-comment">// call far 会将cs也入栈，我们直接改掉</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xc0</span><br>        _emit <span class="hljs-number">0x2</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xf0</span><br>        _emit <span class="hljs-number">0x20</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0xc3</span><br>    &#125;<br>&#125;<br><br><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> target[<span class="hljs-number">8</span>] = &#123;<span class="hljs-number">0x8A</span>, <span class="hljs-number">0x10</span>, <span class="hljs-number">0x40</span>, <span class="hljs-number">0x00</span>, <span class="hljs-number">0x33</span>, <span class="hljs-number">0x00</span>, <span class="hljs-number">0x00</span>, <span class="hljs-number">0x00</span>&#125;;		<span class="hljs-comment">// 这里存好opcode的地址</span><br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">int</span> a = <span class="hljs-number">0x30</span>;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0x8D</span>      <span class="hljs-comment">// lea ecx, [ebp + a]    ; a</span><br>        _emit <span class="hljs-number">0x4D</span><br>        _emit <span class="hljs-number">0xFC</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0xFF</span>      <span class="hljs-comment">// call fword ptr target(4468C0)  &lt;=&gt;  call far 33:40108A</span><br>        _emit <span class="hljs-number">0x1D</span><br>        _emit <span class="hljs-number">0xC0</span><br>        _emit <span class="hljs-number">0x68</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x00</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0xE8</span>      <span class="hljs-comment">// call $+5</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0xC7</span>      <span class="hljs-comment">// mov dword [rsp + 4], 0x23</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x23</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x83</span>      <span class="hljs-comment">// add dword [rsp], 0xD</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x0D</span><br><br>        _emit <span class="hljs-number">0xCB</span>      <span class="hljs-comment">// retf</span><br>    &#125;<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);<br><br>    target[<span class="hljs-number">1</span>]++;      <span class="hljs-comment">// 留存target的地址</span><br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>  这种方法需要注意的是：call far会将cs一起入栈，一共入栈8字节，</p>
+<p>  <img onerror="imgOnError(this);" data-fancybox="gallery" src="C:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240710171556802.png" alt="image-20240710171556802" data-caption="image-20240710171556802" loading="lazy"></p>
+<p>  所以我们直接改掉就好，也不需要再push 0了</p>
+</li>
+<li><p>利用retf进门</p>
+  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-type">void</span> __fastcall <span class="hljs-title">XOR</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; a)</span></span><br><span class="hljs-function"></span>&#123;<br>    __asm &#123;<br>        _emit <span class="hljs-number">0x48</span>      <span class="hljs-comment">//                  &lt;--- address: 40108A</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xc0</span><br>        _emit <span class="hljs-number">0x2</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x0</span><br>        _emit <span class="hljs-number">0x83</span><br>        _emit <span class="hljs-number">0xf0</span><br>        _emit <span class="hljs-number">0x20</span><br>        _emit <span class="hljs-number">0x48</span><br>        _emit <span class="hljs-number">0x8b</span><br>        _emit <span class="hljs-number">0x4c</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x8</span><br>        _emit <span class="hljs-number">0x89</span><br>        _emit <span class="hljs-number">0x1</span><br>        _emit <span class="hljs-number">0xc3</span><br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-type">int</span> a = <span class="hljs-number">0x30</span>;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0x8D</span>      <span class="hljs-comment">// lea ecx, [ebp + a]    ; a</span><br>        _emit <span class="hljs-number">0x4D</span><br>        _emit <span class="hljs-number">0xFC</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0x6A</span>      <span class="hljs-comment">// push 0x33</span><br>        _emit <span class="hljs-number">0x33</span><br><br>        _emit <span class="hljs-number">0xE8</span>      <span class="hljs-comment">// call $+5</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x83</span>      <span class="hljs-comment">// add dword [esp], 5</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x05</span><br><br>        _emit <span class="hljs-number">0xCB</span>      <span class="hljs-comment">// retf</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0xE8</span>      <span class="hljs-comment">// call的相对跳转  call 40108A</span><br>        _emit <span class="hljs-number">0xA8</span>      <span class="hljs-comment">// 目标地址与call的后一条指令地址的差</span><br>        _emit <span class="hljs-number">0xFF</span><br>        _emit <span class="hljs-number">0xFF</span><br>        _emit <span class="hljs-number">0xFF</span><br>    &#125;<br><br>    __asm &#123;<br>        _emit <span class="hljs-number">0xE8</span>      <span class="hljs-comment">// call $+5             &lt;--- address: 4010E2</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0xC7</span>      <span class="hljs-comment">// mov dword [rsp + 4], 0x23</span><br>        _emit <span class="hljs-number">0x44</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x23</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br>        _emit <span class="hljs-number">0x00</span><br><br>        _emit <span class="hljs-number">0x83</span>      <span class="hljs-comment">// add dword [rsp], 0xD</span><br>        _emit <span class="hljs-number">0x04</span><br>        _emit <span class="hljs-number">0x24</span><br>        _emit <span class="hljs-number">0x0D</span><br><br>        _emit <span class="hljs-number">0xCB</span>      <span class="hljs-comment">// retf</span><br>    &#125;<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, a);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>  这种方式最为简单，只需要预留好便宜量即可，但也最容易被发现</p>
+</li>
+</ul>
+<p><strong>以上三种跳转方式结合使用可以进一步增加天堂之门的逆向难度</strong></p>
+<h2 id="出题技巧"><a href="#出题技巧" class="headerlink" title="出题技巧"></a>出题技巧</h2><ul>
+<li><p>单独起一个天堂之门跳转后检测调试，如果检测到调试更改掉 key（用反调试隐藏反调试）</p>
+</li>
+<li><p>利用花指令、SEH异常处理，SMC等混淆手段隐藏掉天堂之门入口处的跳转指令</p>
+</li>
+<li><p>多种跳转方式结合使用</p>
+</li>
+</ul>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><h3 id="西湖论剑2023-Dual-personality"><a href="#西湖论剑2023-Dual-personality" class="headerlink" title="西湖论剑2023 Dual personality"></a>西湖论剑2023 Dual personality</h3>
+    <p><img src="https://s2.loli.net/2024/04/14/jbJvEX1hxiCz7OR.jpg" loading="eager"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>Author：</strong>Pinguw<br>
+        <strong>Link：</strong><a href="http://pinguw.github.io/2024/07/10/Reverse/Heaven-Gate/" title="http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;07&#x2F;10&#x2F;Reverse&#x2F;Heaven-Gate&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;07&#x2F;10&#x2F;Reverse&#x2F;Heaven-Gate&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/Re%E5%88%86%E4%BA%AB/" rel="tag">Re分享</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1720605372154"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%80%9C%E5%A4%A9%E5%A0%82%E4%B9%8B%E9%97%A8%E2%80%9D%E4%BB%8B%E7%BB%8D%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">“天堂之门”介绍：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E4%B9%8B%E9%97%B4%E7%9A%84%E5%88%87%E6%8D%A2%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">架构之间的切换：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%A4%BA%E4%BE%8B"><span class="toc-number">3.</span> <span class="toc-text">实现示例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">环境配置：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%EF%BC%9A"><span class="toc-number">3.2.</span> <span class="toc-text">代码实现：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.</span> <span class="toc-text">其他实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BA%E9%A2%98%E6%8A%80%E5%B7%A7"><span class="toc-number">5.</span> <span class="toc-text">出题技巧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%88%98"><span class="toc-number">6.</span> <span class="toc-text">实战</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%912023-Dual-personality"><span class="toc-number">6.1.</span> <span class="toc-text">西湖论剑2023 Dual personality</span></a></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="Search" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
