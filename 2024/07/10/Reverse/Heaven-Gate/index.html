@@ -38,7 +38,7 @@
 <meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240711121743651.png">
 <meta property="og:image" content="c:\Users\HP\AppData\Roaming\Typora\typora-user-images\image-20240711121751522.png">
 <meta property="article:published_time" content="2024-07-10T09:54:38.000Z">
-<meta property="article:modified_time" content="2024-07-11T04:21:38.576Z">
+<meta property="article:modified_time" content="2024-07-11T04:24:23.909Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="Re分享">
 <meta name="twitter:card" content="summary">
@@ -48,15 +48,15 @@
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1720671701961">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1720671867741">
 
-<link rel="stylesheet" href="/css/style.css?v=1720671701961">
+<link rel="stylesheet" href="/css/style.css?v=1720671867741">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1720671701961">
+        <link rel="stylesheet" href="/custom.css?v=1720671867741">
     
 
 
@@ -66,7 +66,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1720671701961"></script>
+<script async src="/js/app.js?v=1720671867741"></script>
 
  
 
@@ -338,7 +338,7 @@
 <h2 id="架构之间的切换："><a href="#架构之间的切换：" class="headerlink" title="架构之间的切换："></a>架构之间的切换：</h2><p>首先我们要知道32位寄存器cs的值是0x23，64位cs寄存器的值是0x33，我们将cs的值在这两者间切换，便达到了跨架构运行程序的目的。</p>
 <p>那么我们如何更改寄存器cs的值呢？<br>我们知道，mov指令是无法直接改变cs寄存器的值的，需要借助<code> call</code>和<code> retf</code>来实现cs段的切换</p>
 <p><code>call far</code>和<code>retf(ret far)</code>是可以同时改变cs和ip的：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">push 0x33                ;0x33作为cs的新值<br>call $+5                ;下一条指令的地址入栈<br>add dword [esp], 5        ;+5后即是指向retf的下一条指令<br>retf                     ;跳转到下一条指令，同时pop is和pop cs<br></code></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs asm">push 0x33                ;0x33作为cs的新值<br>call $+5                ;下一条指令的地址入栈<br>add dword [esp], 5        ;+5后即是指向retf的下一条指令<br>retf                     ;跳转到下一条指令，同时pop is和pop cs<br></code></pre></td></tr></table></figure>
 
 <p>或者使用<code>ljmp(jmp far)</code>（仅在32位到64位时）：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs assembly">jmp far 33:地址<br></code></pre></td></tr></table></figure>
@@ -489,7 +489,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1720671701938"></script>
+    <script async src="/js/copy-codeblock.js?v=1720671867719"></script>
   
 
   
