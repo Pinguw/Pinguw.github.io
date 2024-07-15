@@ -9,41 +9,41 @@
 <meta name="description" content="四道re（那个misc就是纯逆向）   Reverse2048审计源码，看出每轮将获得分数为输入的sorce，上限为当前得分，初次上限为1w，那么每次成功分数翻倍的情况下用不了几次即可到达100w分：    RCTF{you_are_2048_master}  bloker_vm在每种case中下断点，可得到加密逻辑， 但是没看出反调试的影响在哪里。   解密代码： 123456789101112">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RCTF2024部分题解">
-<meta property="og:url" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/index.html">
+<meta property="og:url" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/index.html">
 <meta property="og:site_name" content="Pinguw&#39;s Blog">
 <meta property="og:description" content="四道re（那个misc就是纯逆向）   Reverse2048审计源码，看出每轮将获得分数为输入的sorce，上限为当前得分，初次上限为1w，那么每次成功分数翻倍的情况下用不了几次即可到达100w分：    RCTF{you_are_2048_master}  bloker_vm在每种case中下断点，可得到加密逻辑， 但是没看出反调试的影响在哪里。   解密代码： 123456789101112">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/rctf.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/2048.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/vm.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/tree.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/mix.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/z3.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/trytry.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/flag.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/3000.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/enc.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/cawcaw1kaka.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/rctf.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/2048.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/vm.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/tree.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/mix.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/z3.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/trytry.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/flag.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/3000.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/enc.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/cawcaw1kaka.png">
 <meta property="article:published_time" content="2024-05-29T12:52:43.000Z">
 <meta property="article:modified_time" content="2024-06-05T08:07:25.456Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="WriteUp">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/rctf.png">
+<meta name="twitter:image" content="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/RCTF2024/rctf.png">
 
 <link rel="stylesheet" href="/lib/fancybox/fancybox.css">
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1720966540023">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1721028854160">
 
-<link rel="stylesheet" href="/css/style.css?v=1720966540023">
+<link rel="stylesheet" href="/css/style.css?v=1721028854160">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1720966540023">
+        <link rel="stylesheet" href="/custom.css?v=1721028854160">
     
 
 
@@ -53,7 +53,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1720966540023"></script>
+<script async src="/js/app.js?v=1721028854160"></script>
 
  
 
@@ -380,7 +380,7 @@
       
     <div class="nexmoe-post-copyright">
         <strong>Author：</strong>Pinguw<br>
-        <strong>Link：</strong><a href="http://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/" title="http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;29&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;RCTF2024&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;29&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;RCTF2024&#x2F;</a><br>
+        <strong>Link：</strong><a href="https://pinguw.github.io/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/" title="https:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;29&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;RCTF2024&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;29&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;RCTF2024&#x2F;</a><br>
         
             <strong>看完了吗，</strong>再去看看<a href="https://pinguw.github.io/" target="_blank">博主的其他文章</a>叭:)
 
@@ -398,7 +398,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1720966539978"></script>
+    <script async src="/js/copy-codeblock.js?v=1721028854109"></script>
   
 
   

@@ -9,38 +9,38 @@
 <meta name="description" content="很菜，初赛只出了三道题。   asm_re拿到手是IDA的view界面， main函数逻辑交给GPT，是简单的加减乘除异或， data段手动dump出+解密： 1234567891011121314151617181920212223242526272829303132333435363738394041data &#x3D; [    0xD7, 0x1F, 0x00, 0x00, 0xB7, 0x21,">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CISCN2024-Reverse部分题解">
-<meta property="og:url" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/index.html">
+<meta property="og:url" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/index.html">
 <meta property="og:site_name" content="Pinguw&#39;s Blog">
 <meta property="og:description" content="很菜，初赛只出了三道题。   asm_re拿到手是IDA的view界面， main函数逻辑交给GPT，是简单的加减乘除异或， data段手动dump出+解密： 1234567891011121314151617181920212223242526272829303132333435363738394041data &#x3D; [    0xD7, 0x1F, 0x00, 0x00, 0xB7, 0x21,">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/CISCN2024.jpeg">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/jadx.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/key.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/iv1.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/iv2.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/des.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/debug1.png">
-<meta property="og:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/debug2.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/CISCN2024.jpeg">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/jadx.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/key.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/iv1.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/iv2.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/des.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/debug1.png">
+<meta property="og:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/debug2.png">
 <meta property="article:published_time" content="2024-05-22T07:21:02.000Z">
 <meta property="article:modified_time" content="2024-06-05T08:08:20.086Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="WriteUp">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/CISCN2024.jpeg">
+<meta name="twitter:image" content="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/CISCN2024/CISCN2024.jpeg">
 
 <link rel="stylesheet" href="/lib/fancybox/fancybox.css">
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1720966540026">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1721028854163">
 
-<link rel="stylesheet" href="/css/style.css?v=1720966540026">
+<link rel="stylesheet" href="/css/style.css?v=1721028854163">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1720966540026">
+        <link rel="stylesheet" href="/custom.css?v=1721028854163">
     
 
 
@@ -50,7 +50,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1720966540026"></script>
+<script async src="/js/app.js?v=1721028854163"></script>
 
  
 
@@ -367,7 +367,7 @@
       
     <div class="nexmoe-post-copyright">
         <strong>Author：</strong>Pinguw<br>
-        <strong>Link：</strong><a href="http://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/" title="http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;22&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;CISCN2024&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;22&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;CISCN2024&#x2F;</a><br>
+        <strong>Link：</strong><a href="https://pinguw.github.io/2024/05/22/%E6%AF%94%E8%B5%9BWP/CISCN2024/" title="https:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;22&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;CISCN2024&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;05&#x2F;22&#x2F;%E6%AF%94%E8%B5%9BWP&#x2F;CISCN2024&#x2F;</a><br>
         
             <strong>看完了吗，</strong>再去看看<a href="https://pinguw.github.io/" target="_blank">博主的其他文章</a>叭:)
 
@@ -385,7 +385,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1720966539978"></script>
+    <script async src="/js/copy-codeblock.js?v=1721028854110"></script>
   
 
   
