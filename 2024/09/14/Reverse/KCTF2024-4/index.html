@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en"><head>
+<title>KCTF2024第四题-神秘信号 &amp; PVM注入 - Pinguw&#39;s Blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" type="image/png" />
+<meta name="description" content="跟Nep打KCTF的时候遇上了一个能帮得上忙的题，正好前几天学了一个py逆向的小技巧，现在发挥作用了。 KCTF2024第四题-神秘信号先解包后反编译main.py： 1234567891011121314151617181920212223#!&#x2F;usr&#x2F;bin&#x2F;env python# visit https:&#x2F;&#x2F;tool.lu&#x2F;pyc&#x2F; for more information# Version">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KCTF2024第四题-神秘信号 &amp; PVM注入">
+<meta property="og:url" content="https://pinguw.github.io/2024/09/14/Reverse/KCTF2024-4/index.html">
+<meta property="og:site_name" content="Pinguw&#39;s Blog">
+<meta property="og:description" content="跟Nep打KCTF的时候遇上了一个能帮得上忙的题，正好前几天学了一个py逆向的小技巧，现在发挥作用了。 KCTF2024第四题-神秘信号先解包后反编译main.py： 1234567891011121314151617181920212223#!&#x2F;usr&#x2F;bin&#x2F;env python# visit https:&#x2F;&#x2F;tool.lu&#x2F;pyc&#x2F; for more information# Version">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="og:image" content="e:\Pinguw">
+<meta property="article:published_time" content="2024-09-14T09:19:22.000Z">
+<meta property="article:modified_time" content="2024-09-14T11:34:51.995Z">
+<meta property="article:author" content="Pinguw">
+<meta property="article:tag" content="Re分享">
+<meta property="article:tag" content="WriteUp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="e:\Pinguw">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1726313930267">
+
+<link rel="stylesheet" href="/css/style.css?v=1726313930267">
+
+
+
+
+    
+        <link rel="stylesheet" href="/custom.css?v=1726313930267">
+    
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/lib/lax.min.js" async></script>
+
+
+<script async src="/js/app.js?v=1726313930267"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script> 
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.1.1"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(https://s2.loli.net/2024/04/14/EJTHkjYwI4dil9K.jpg)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="Pinguw"><img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="Pinguw">
+            <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw" alt="Pinguw">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>10</div>
+        <div><span>Tags</span>4</div>
+        <div><span>Categories</span>3</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archives.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/friends.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/donate.html" title="给我赞助">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                给我赞助
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/aboutme.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://space.bilibili.com/416333261"
+			target="_blank"
+			mdui-tooltip="{content: '哔哩哔哩'}"
+			style="
+				color: rgb(231, 106, 141);
+				background-color: rgba(231, 106, 141, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-bilibili"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/Pinguw"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/Reverse/">Reverse</a>
+          <span class="category-list-count">6</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/比赛WP/">比赛WP</a>
+          <span class="category-list-count">5</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 20px;">Re分享</a> <a href="/tags/WriteUp/" style="font-size: 20px;">WriteUp</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 15px;">刷题记录</a> <a href="/tags/%E8%8C%B6%E4%BD%99%E9%A5%AD%E5%90%8E/" style="font-size: 10px;">茶余饭后</a>
+    </div>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">10</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Recent Posts</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/09/14/Reverse/KCTF2024-4/">KCTF2024第四题-神秘信号 &amp; PVM注入</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/14/Reverse/IDA/">IDA使用入门</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/10/Reverse/Heaven-Gate/">敲响天堂之门</a>
+          </li>
+        
+          <li>
+            <a href="/2024/06/05/%E6%AF%94%E8%B5%9BWP/HASHCTF2024/">HASHCTF2024-Reverse题解</a>
+          </li>
+        
+          <li>
+            <a href="/2024/05/29/%E6%AF%94%E8%B5%9BWP/RCTF2024/">RCTF2024部分题解</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+            <li>
+                <a href="https://Pinguw.github.io/" target="_blank" >
+                    <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></img>
+                    <p>Pinguw</p>
+                </a>
+            </li>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2024 Pinguw
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 54.285714285714285%;"> 
+            <img src="https://s2.loli.net/2024/09/14/lbVAzPWtHh6KSvg.jpg" alt="KCTF2024第四题-神秘信号 &amp; PVM注入" loading="lazy">
+            <h1>KCTF2024第四题-神秘信号 &amp; PVM注入</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2024年09月14日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E6%AF%94%E8%B5%9BWP/">比赛WP</a><a class="nexmoefont icon-appstore-fill -link" href="/categories/%E6%AF%94%E8%B5%9BWP/Reverse/">Reverse</a>
+        
+        
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>跟Nep打KCTF的时候遇上了一个能帮得上忙的题，正好前几天学了一个py逆向的小技巧，现在发挥作用了。</p>
+<h1 id="KCTF2024第四题-神秘信号"><a href="#KCTF2024第四题-神秘信号" class="headerlink" title="KCTF2024第四题-神秘信号"></a>KCTF2024第四题-神秘信号</h1><p>先解包后反编译main.py：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/env python</span><br><span class="hljs-comment"># visit https://tool.lu/pyc/ for more information</span><br><span class="hljs-comment"># Version: Python 3.8</span><br><br><span class="hljs-keyword">import</span> CrackMe<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;(账号密码由字母大小写、数字、!、空格组成)&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;请输入账号：&#x27;</span>)<br>h = <span class="hljs-built_in">input</span>()<br>z = CrackMe.main(h)<br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(z) &lt; <span class="hljs-number">20</span>:<br>    key = <span class="hljs-string">&#x27;dZpKdrsiB6cndrGY&#x27;</span> + z<br><span class="hljs-keyword">else</span>:<br>    key = z[<span class="hljs-number">0</span>:<span class="hljs-number">4</span>] + <span class="hljs-string">&#x27;dZpK&#x27;</span> + z[<span class="hljs-number">4</span>:<span class="hljs-number">8</span>] + <span class="hljs-string">&#x27;drsi&#x27;</span> + z[<span class="hljs-number">8</span>:<span class="hljs-number">12</span>] + <span class="hljs-string">&#x27;B6cn&#x27;</span> + z[<span class="hljs-number">12</span>:<span class="hljs-number">16</span>] + <span class="hljs-string">&#x27;drGY&#x27;</span> + z[<span class="hljs-number">16</span>:]<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;请输入验证码：&#x27;</span>)<br>h = <span class="hljs-built_in">input</span>()<br>m = CrackMe.main(h)<br><span class="hljs-keyword">if</span> key == m:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Success&#x27;</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;Fail&#x27;</span>)<br><span class="hljs-keyword">continue</span><br><span class="hljs-keyword">continue</span><br><br></code></pre></td></tr></table></figure>
+
+<p>看得出来核心逻辑在CrackMe的main模块里，</p>
+<p>但是直接翻解包出来的文件没有找到CrackMe的踪影。</p>
+<p>用上面的方法注入一下代码看一下CrackMe的属性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># code.py</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;===============================================&quot;</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">dir</span>(CrackMe))<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;===============================================&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\file.png" alt="file" data-caption="file" loading="lazy">
+
+<p>没有<code>__file__</code>属性，说明可能是一个动态生成的模块，</p>
+<p>试试直接dump main：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;===============================================&quot;</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">dir</span>(CrackMe.main.__code__))<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;===============================================&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\code.png" alt="code" data-caption="code" loading="lazy">
+
+<p>有<code>__code__</code>属性，直接dump：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> marshal<br><span class="hljs-keyword">import</span> importlib<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;===============================================&quot;</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">dir</span>(CrackMe.main.__code__))<br>code1 = CrackMe.main.__code__<br><br><span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;dumped_main.marshal&quot;</span>, <span class="hljs-string">&quot;wb&quot;</span>).write(marshal.dumps(code1))<br><br><span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;dumped_main.marshal&quot;</span>, <span class="hljs-string">&quot;rb&quot;</span>) <span class="hljs-keyword">as</span> f:<br>    code = marshal.load(f)<br><br>pyc_data = importlib._bootstrap_external._code_to_timestamp_pyc(code)<br><span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;file_main.pyc&quot;</span>, <span class="hljs-string">&quot;wb&quot;</span>) <span class="hljs-keyword">as</span> f:<br>    f.write(pyc_data)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;===============================================&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>成功：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\dump.png" alt="dump" data-caption="dump" loading="lazy">
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\crack.png" alt="image-20240914174128254" data-caption="image-20240914174128254" loading="lazy">
+
+<p>逆一下逻辑：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">encode</span>(<span class="hljs-params">data</span>):<br>    encoded_str = <span class="hljs-string">&#x27;&#x27;</span><br>    padding = <span class="hljs-number">0</span><br>    base64_chars = <span class="hljs-string">&#x27;ZQ+U7tSBEKVzyf5coCwb94Dd6raT0eLNin12Hp8mOxFuvMgIPlhRY3WjksqJAXG/&#x27;</span><br>    ww = <span class="hljs-string">b&#x27;&#x27;</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> data:<br>        i = i ^ <span class="hljs-number">85</span><br>        ww = ww + i.to_bytes(<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;little&#x27;</span>)<br>    data = ww<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(data), <span class="hljs-number">3</span>):<br>        chunk = data[i:i + <span class="hljs-number">3</span>]<br>        binary_str = <span class="hljs-string">&#x27;&#x27;</span>.join(<span class="hljs-built_in">format</span>(byte, <span class="hljs-string">&#x27;08b&#x27;</span>) <span class="hljs-keyword">for</span> byte <span class="hljs-keyword">in</span> chunk)<br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(binary_str), <span class="hljs-number">6</span>):<br>            six_bits = binary_str[j:j + <span class="hljs-number">6</span>]<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(six_bits) &lt; <span class="hljs-number">6</span>:<br>                padding += <span class="hljs-number">6</span> - <span class="hljs-built_in">len</span>(six_bits)<br>                six_bits += <span class="hljs-string">&#x27;0&#x27;</span> * (<span class="hljs-number">6</span> - <span class="hljs-built_in">len</span>(six_bits))<br>            encoded_str += base64_chars[<span class="hljs-built_in">int</span>(six_bits, <span class="hljs-number">2</span>)]<br>    encoded_str += <span class="hljs-string">&#x27;!&#x27;</span> * (padding // <span class="hljs-number">2</span>)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(encoded_str) // <span class="hljs-number">2</span>):<br>        a = encoded_str[i * <span class="hljs-number">2</span>]<br>        b = encoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>]<br>        encoded_str = encoded_str[:i * <span class="hljs-number">2</span>] + b + a + encoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">2</span>:]<br>    <span class="hljs-keyword">return</span> encoded_str<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">decode</span>(<span class="hljs-params">encoded_str</span>):<br>    base64_chars = <span class="hljs-string">&#x27;ZQ+U7tSBEKVzyf5coCwb94Dd6raT0eLNin12Hp8mOxFuvMgIPlhRY3WjksqJAXG/&#x27;</span><br>    decoded_str = <span class="hljs-built_in">list</span>(encoded_str)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(decoded_str) // <span class="hljs-number">2</span>):<br>        a = decoded_str[i * <span class="hljs-number">2</span>]<br>        b = decoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>]<br>        decoded_str[i * <span class="hljs-number">2</span>], decoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>] = b, a<br>    decoded_str = <span class="hljs-string">&#x27;&#x27;</span>.join(decoded_str)<br><br>    padding = decoded_str.count(<span class="hljs-string">&#x27;!&#x27;</span>)<br>    decoded_str = decoded_str.rstrip(<span class="hljs-string">&#x27;!&#x27;</span>)<br><br>    binary_str = <span class="hljs-string">&#x27;&#x27;</span><br>    <span class="hljs-keyword">for</span> char <span class="hljs-keyword">in</span> decoded_str:<br>        binary_str += <span class="hljs-built_in">format</span>(base64_chars.index(char), <span class="hljs-string">&#x27;06b&#x27;</span>)<br>    <span class="hljs-keyword">if</span> padding:<br>        binary_str = binary_str[:-padding]<br>    decoded_bytes = <span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(binary_str), <span class="hljs-number">8</span>):<br>        byte = binary_str[i:i + <span class="hljs-number">8</span>]<br>        decoded_bytes.append(<span class="hljs-built_in">int</span>(byte, <span class="hljs-number">2</span>))<br>    original_data = <span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> byte <span class="hljs-keyword">in</span> decoded_bytes:<br>        original_data.append(byte ^ <span class="hljs-number">85</span>)<br><br>    <span class="hljs-keyword">return</span> original_data<br></code></pre></td></tr></table></figure>
+
+<p>回头看一下，这个encode函数，传入的参数data类型是bytes，但是main.py调用的时候传递的是str，</p>
+<p>先模拟一下main中的输入输出，</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">encode</span>(<span class="hljs-params">data</span>):<br>    encoded_str = <span class="hljs-string">&#x27;&#x27;</span><br>    padding = <span class="hljs-number">0</span><br>    base64_chars = <span class="hljs-string">&#x27;ZQ+U7tSBEKVzyf5coCwb94Dd6raT0eLNin12Hp8mOxFuvMgIPlhRY3WjksqJAXG/&#x27;</span><br>    ww = <span class="hljs-string">b&#x27;&#x27;</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> data:<br>        i = i ^ <span class="hljs-number">85</span><br>        ww = ww + i.to_bytes(<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;little&#x27;</span>)<br>    data = ww<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(data), <span class="hljs-number">3</span>):<br>        chunk = data[i:i + <span class="hljs-number">3</span>]<br>        binary_str = <span class="hljs-string">&#x27;&#x27;</span>.join(<span class="hljs-built_in">format</span>(byte, <span class="hljs-string">&#x27;08b&#x27;</span>) <span class="hljs-keyword">for</span> byte <span class="hljs-keyword">in</span> chunk)<br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(binary_str), <span class="hljs-number">6</span>):<br>            six_bits = binary_str[j:j + <span class="hljs-number">6</span>]<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(six_bits) &lt; <span class="hljs-number">6</span>:<br>                padding += <span class="hljs-number">6</span> - <span class="hljs-built_in">len</span>(six_bits)<br>                six_bits += <span class="hljs-string">&#x27;0&#x27;</span> * (<span class="hljs-number">6</span> - <span class="hljs-built_in">len</span>(six_bits))<br>            encoded_str += base64_chars[<span class="hljs-built_in">int</span>(six_bits, <span class="hljs-number">2</span>)]<br>    encoded_str += <span class="hljs-string">&#x27;!&#x27;</span> * (padding // <span class="hljs-number">2</span>)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(encoded_str) // <span class="hljs-number">2</span>):<br>        a = encoded_str[i * <span class="hljs-number">2</span>]<br>        b = encoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>]<br>        encoded_str = encoded_str[:i * <span class="hljs-number">2</span>] + b + a + encoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">2</span>:]<br>    <span class="hljs-keyword">return</span> encoded_str<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">decode</span>(<span class="hljs-params">encoded_str</span>):<br>    base64_chars = <span class="hljs-string">&#x27;ZQ+U7tSBEKVzyf5coCwb94Dd6raT0eLNin12Hp8mOxFuvMgIPlhRY3WjksqJAXG/&#x27;</span><br>    decoded_str = <span class="hljs-built_in">list</span>(encoded_str)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(decoded_str) // <span class="hljs-number">2</span>):<br>        a = decoded_str[i * <span class="hljs-number">2</span>]<br>        b = decoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>]<br>        decoded_str[i * <span class="hljs-number">2</span>], decoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>] = b, a<br>    decoded_str = <span class="hljs-string">&#x27;&#x27;</span>.join(decoded_str)<br><br>    padding = decoded_str.count(<span class="hljs-string">&#x27;!&#x27;</span>)<br>    decoded_str = decoded_str.rstrip(<span class="hljs-string">&#x27;!&#x27;</span>)<br><br>    binary_str = <span class="hljs-string">&#x27;&#x27;</span><br>    <span class="hljs-keyword">for</span> char <span class="hljs-keyword">in</span> decoded_str:<br>        binary_str += <span class="hljs-built_in">format</span>(base64_chars.index(char), <span class="hljs-string">&#x27;06b&#x27;</span>)<br>    <span class="hljs-keyword">if</span> padding:<br>        binary_str = binary_str[:-padding]<br>    decoded_bytes = <span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(binary_str), <span class="hljs-number">8</span>):<br>        byte = binary_str[i:i + <span class="hljs-number">8</span>]<br>        decoded_bytes.append(<span class="hljs-built_in">int</span>(byte, <span class="hljs-number">2</span>))<br>    original_data = <span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> byte <span class="hljs-keyword">in</span> decoded_bytes:<br>        original_data.append(byte ^ <span class="hljs-number">85</span>)<br><br>    <span class="hljs-keyword">return</span> original_data<br><br>h = <span class="hljs-string">b&#x27;D7C4197AF0806891&#x27;</span><br>z = encode(h)<br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(z) &lt; <span class="hljs-number">20</span>:<br>    key = <span class="hljs-string">&#x27;dZpKdrsiB6cndrGY&#x27;</span> + z<br><span class="hljs-keyword">else</span>:<br>    key = z[<span class="hljs-number">0</span>:<span class="hljs-number">4</span>] + <span class="hljs-string">&#x27;dZpK&#x27;</span> + z[<span class="hljs-number">4</span>:<span class="hljs-number">8</span>] + <span class="hljs-string">&#x27;drsi&#x27;</span> + z[<span class="hljs-number">8</span>:<span class="hljs-number">12</span>] + <span class="hljs-string">&#x27;B6cn&#x27;</span> + z[<span class="hljs-number">12</span>:<span class="hljs-number">16</span>] + <span class="hljs-string">&#x27;drGY&#x27;</span> + z[<span class="hljs-number">16</span>:]<br><br><span class="hljs-built_in">print</span>(key)<br><span class="hljs-comment"># print(z)</span><br><br>w = <span class="hljs-string">&#x27;D7CHel419lo 7AFWor080ld!6891&#x27;</span><br>x = encode(w.encode())<br><span class="hljs-built_in">print</span>(x)<br></code></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\why.png" alt="why" data-caption="why" loading="lazy">
+
+<p>发现给的标准输入输出结果对不起来，</p>
+<p>那么在main中还有哪里可能做修改呢？</p>
+<p>只能是input()</p>
+<p>输出一下input()后的值：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\a1.png" alt="a1" data-caption="a1" loading="lazy">
+
+<p>看起来是将可见输入做了一个映射，打印一下映射表：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\a2.png" alt="a2" data-caption="a2" loading="lazy">
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\a3.png" alt="a3" data-caption="a3" loading="lazy">
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\a4.png" alt="a4" data-caption="a4" loading="lazy">
+
+<p>解密代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">encode</span>(<span class="hljs-params">data</span>):<br>    encoded_str = <span class="hljs-string">&#x27;&#x27;</span><br>    padding = <span class="hljs-number">0</span><br>    base64_chars = <span class="hljs-string">&#x27;ZQ+U7tSBEKVzyf5coCwb94Dd6raT0eLNin12Hp8mOxFuvMgIPlhRY3WjksqJAXG/&#x27;</span><br>    ww = <span class="hljs-string">b&#x27;&#x27;</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> data:<br>        i = i ^ <span class="hljs-number">85</span><br>        ww = ww + i.to_bytes(<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;little&#x27;</span>)<br>    data = ww<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(data), <span class="hljs-number">3</span>):<br>        chunk = data[i:i + <span class="hljs-number">3</span>]<br>        binary_str = <span class="hljs-string">&#x27;&#x27;</span>.join(<span class="hljs-built_in">format</span>(byte, <span class="hljs-string">&#x27;08b&#x27;</span>) <span class="hljs-keyword">for</span> byte <span class="hljs-keyword">in</span> chunk)<br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(binary_str), <span class="hljs-number">6</span>):<br>            six_bits = binary_str[j:j + <span class="hljs-number">6</span>]<br>            <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(six_bits) &lt; <span class="hljs-number">6</span>:<br>                padding += <span class="hljs-number">6</span> - <span class="hljs-built_in">len</span>(six_bits)<br>                six_bits += <span class="hljs-string">&#x27;0&#x27;</span> * (<span class="hljs-number">6</span> - <span class="hljs-built_in">len</span>(six_bits))<br>            encoded_str += base64_chars[<span class="hljs-built_in">int</span>(six_bits, <span class="hljs-number">2</span>)]<br>    encoded_str += <span class="hljs-string">&#x27;!&#x27;</span> * (padding // <span class="hljs-number">2</span>)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(encoded_str) // <span class="hljs-number">2</span>):<br>        a = encoded_str[i * <span class="hljs-number">2</span>]<br>        b = encoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>]<br>        encoded_str = encoded_str[:i * <span class="hljs-number">2</span>] + b + a + encoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">2</span>:]<br>    <span class="hljs-keyword">return</span> encoded_str<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">decode</span>(<span class="hljs-params">encoded_str</span>):<br>    base64_chars = <span class="hljs-string">&#x27;ZQ+U7tSBEKVzyf5coCwb94Dd6raT0eLNin12Hp8mOxFuvMgIPlhRY3WjksqJAXG/&#x27;</span><br>    decoded_str = <span class="hljs-built_in">list</span>(encoded_str)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(decoded_str) // <span class="hljs-number">2</span>):<br>        a = decoded_str[i * <span class="hljs-number">2</span>]<br>        b = decoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>]<br>        decoded_str[i * <span class="hljs-number">2</span>], decoded_str[i * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>] = b, a<br>    decoded_str = <span class="hljs-string">&#x27;&#x27;</span>.join(decoded_str)<br><br>    padding = decoded_str.count(<span class="hljs-string">&#x27;!&#x27;</span>)<br>    decoded_str = decoded_str.rstrip(<span class="hljs-string">&#x27;!&#x27;</span>)<br><br>    binary_str = <span class="hljs-string">&#x27;&#x27;</span><br>    <span class="hljs-keyword">for</span> char <span class="hljs-keyword">in</span> decoded_str:<br>        binary_str += <span class="hljs-built_in">format</span>(base64_chars.index(char), <span class="hljs-string">&#x27;06b&#x27;</span>)<br>    <span class="hljs-keyword">if</span> padding:<br>        binary_str = binary_str[:-padding]<br>    decoded_bytes = <span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(binary_str), <span class="hljs-number">8</span>):<br>        byte = binary_str[i:i + <span class="hljs-number">8</span>]<br>        decoded_bytes.append(<span class="hljs-built_in">int</span>(byte, <span class="hljs-number">2</span>))<br>    original_data = <span class="hljs-built_in">bytearray</span>()<br>    <span class="hljs-keyword">for</span> byte <span class="hljs-keyword">in</span> decoded_bytes:<br>        original_data.append(byte ^ <span class="hljs-number">85</span>)<br><br>    <span class="hljs-keyword">return</span> original_data<br><br>a1 = <span class="hljs-string">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><br>b1 = <span class="hljs-string">b&#x27;KJIHGFETSRQPONM&lt;;:98765DCB&#x27;</span>.decode(<span class="hljs-string">&#x27;latin1&#x27;</span>)<br><br>a2 = <span class="hljs-string">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span><br>b2 = <span class="hljs-string">b&quot;+*)(\&#x27;&amp;%43210/.-\x1c\x1b\x1a\x19\x18\x17\x16\x15$#\&quot;&quot;</span>.decode(<span class="hljs-string">&#x27;latin1&#x27;</span>)<br><br>a3 = <span class="hljs-string">&quot;0123456789 !&quot;</span><br>b3 = <span class="hljs-string">b&#x27;\\[ZYXWVUdclk&#x27;</span>.decode(<span class="hljs-string">&#x27;latin1&#x27;</span>)<br><br>a = a1 + a2 + a3<br>b = b1 + b2 + b3<br><br>table1 = <span class="hljs-built_in">str</span>.maketrans(a, b)<br>table2 = <span class="hljs-built_in">str</span>.maketrans(b, a)<br><br>data = <span class="hljs-string">&quot;KCTF&quot;</span><br>enc_data = data.translate(table1)<br>z = encode(enc_data.encode(<span class="hljs-string">&#x27;latin1&#x27;</span>))<br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(z) &lt; <span class="hljs-number">20</span>:<br>    key = <span class="hljs-string">&#x27;dZpKdrsiB6cndrGY&#x27;</span> + z<br><span class="hljs-keyword">else</span>:<br>    key = z[<span class="hljs-number">0</span>:<span class="hljs-number">4</span>] + <span class="hljs-string">&#x27;dZpK&#x27;</span> + z[<span class="hljs-number">4</span>:<span class="hljs-number">8</span>] + <span class="hljs-string">&#x27;drsi&#x27;</span> + z[<span class="hljs-number">8</span>:<span class="hljs-number">12</span>] + <span class="hljs-string">&#x27;B6cn&#x27;</span> + z[<span class="hljs-number">12</span>:<span class="hljs-number">16</span>] + <span class="hljs-string">&#x27;drGY&#x27;</span> + z[<span class="hljs-number">16</span>:]<br><br><span class="hljs-built_in">print</span>(decode(key))<br><br>encode_key = decode(key)<br>encode_key = encode_key.decode(<span class="hljs-string">&#x27;latin1&#x27;</span>)<br>flag = encode_key.translate(table2)<br><span class="hljs-built_in">print</span>(flag)<br><br></code></pre></td></tr></table></figure>
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\flag.png" alt="flag" data-caption="flag" loading="lazy">
+
+<blockquote>
+<p>Hello World!KCTF</p>
+</blockquote>
+<h1 id="PVM注入"><a href="#PVM注入" class="headerlink" title="PVM注入"></a>PVM注入</h1><h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p>目前来看的python逆向常见题型有：逆pyc和逆pyd；</p>
+<p>先说逆pyd，</p>
+<blockquote>
+<p><code>.pyd</code> 文件是 Windows 平台上的 Python 动态加载模块（Dynamic Load Module）。它与 Linux 和 macOS 平台上的 <code>.so</code> 文件类似，都是用于扩展 Python 的功能的二进制文件。</p>
+</blockquote>
+<p>一般的pyd是用Cython编译出的二进制文件，这东西是基本不可逆的。</p>
+<p>逆pyc的类型就比较多了，有直接给pyc的，有打包成exe的，有只给pyc字节码的，这三种本质上没什么区别，毕竟pyc是可以反编译成py文件，难点就在于去花指令和去混淆上。</p>
+<h2 id="什么是PVM注入"><a href="#什么是PVM注入" class="headerlink" title="什么是PVM注入"></a>什么是PVM注入</h2><h3 id="注入原理"><a href="#注入原理" class="headerlink" title="注入原理"></a>注入原理</h3><p>首先要清楚Python代码执行的原理，主要步骤就是CPython把py代码编译成字节码，然后在Python虚拟机（PVM）中执行，</p>
+<p>我们先了解一下Python中的GIL：</p>
+<blockquote>
+<p>GIL 是 Python 中的全局解释器锁（Global Interpreter Lock）的缩写。它是 Python 解释器（特别是 CPython 实现）中的一个机制，用于在多线程环境下保护访问 Python 对象的内存管理和执行。</p>
+</blockquote>
+<p>而CPython实际上是有一些执行接口的，我们可以取得GIL后创建线程，就可以在Python虚拟机中执行Python代码了，实现如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-built_in">Py_SetProgramName</span>(<span class="hljs-string">L&quot;main.py&quot;</span>);		<span class="hljs-comment">// 当前Python程序名</span><br><span class="hljs-built_in">PyEval_InitThreads</span>();<br>PyGILState_STATE s = <span class="hljs-built_in">PyGILState_Ensure</span>();<br><span class="hljs-built_in">PyRun_SimpleString</span>(<span class="hljs-string">&quot;print(&#x27;hello world&#x27;)&quot;</span>);		<span class="hljs-comment">// 执行python代码</span><br><span class="hljs-built_in">PyGILState_Release</span>(s);<br></code></pre></td></tr></table></figure>
+
+<p>对Python虚拟机的注入在github有现成的项目：<a target="_blank" rel="noopener" href="https://github.com/call-042PE/PyInjector/">https://github.com/call-042PE/PyInjector/</a></p>
+<p>他的使用也非常简单，把名为<code>code.py</code>的文件与需要注入的程序放在同一文件夹下即可，<code>code.py</code>的内容就是注入执行的代码。</p>
+<h3 id="注入示例"><a href="#注入示例" class="headerlink" title="注入示例"></a>注入示例</h3><p>我们写一个简单的<code>test.py</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">print_1</span>(<span class="hljs-params">name</span>):<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Hello, &quot;</span> + name + <span class="hljs-string">&quot;!&quot;</span>)<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    name = <span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;What is your name?\n&quot;</span>)<br>    print_1(name)<br></code></pre></td></tr></table></figure>
+
+<p>用pyinstaller打包成exe并执行：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\pyins.png" alt="pyinstaller" data-caption="pyinstaller" loading="lazy">
+
+<p>从PyInjector项目中安装好注入用的dll，再编写一下<code>code.py</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(print_1(<span class="hljs-string">&quot;hacker&quot;</span>))<br></code></pre></td></tr></table></figure>
+
+<p>运行test.exe并等待输入，</p>
+<p>用Process Hacker找到正在运行的test.exe进程：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\here.png" alt="here" data-caption="here" loading="lazy">
+
+<p>注入dll：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\inject.png" alt="inject" data-caption="inject" loading="lazy">
+
+<p>选择对应架构的dll：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\dll.png" alt="dll" data-caption="dll" loading="lazy">
+
+<p>可以看到成功注入：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\yes.png" alt="yes" data-caption="yes" loading="lazy">
+
+<h3 id="pyc字节码dump"><a href="#pyc字节码dump" class="headerlink" title="pyc字节码dump"></a>pyc字节码dump</h3><p>我们知道pyc文件实际上就是文件头 + <code>code object</code>，<code>code object</code>就是代码对象，用于表示编译后的字节码的数据结构。</p>
+<p>我们可以注入Python虚拟机，然后得到代码对象，就可以得到代码逻辑了。</p>
+<p>从<a target="_blank" rel="noopener" href="https://blog.doctor3.net/?p=104">Doctor3师傅的博客</a>中我们知道可以如下dump出exe中的pyc文件：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> sys, marshal<br><span class="hljs-keyword">import</span> importlib<br>i = <span class="hljs-number">0</span><br><span class="hljs-keyword">for</span> frame <span class="hljs-keyword">in</span> sys._current_frames().values():<br>    code = frame.f_code<br>    <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;dumped&quot;</span>+<span class="hljs-built_in">str</span>(i)+<span class="hljs-string">&quot;.marshal&quot;</span>, <span class="hljs-string">&quot;wb&quot;</span>).write(marshal.dumps(code)) <span class="hljs-comment"># Loop all the threads running in the process</span><br><br>    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;dumped&quot;</span>+<span class="hljs-built_in">str</span>(i)+<span class="hljs-string">&quot;.marshal&quot;</span>, <span class="hljs-string">&quot;rb&quot;</span>) <span class="hljs-keyword">as</span> f:<br>        code = marshal.load(f)<br> <br>    pyc_data = importlib._bootstrap_external._code_to_timestamp_pyc(code)<br>    <span class="hljs-comment"># print(pyc_data)</span><br>    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;file&quot;</span>+<span class="hljs-built_in">str</span>(i)+<span class="hljs-string">&quot;.pyc&quot;</span>, <span class="hljs-string">&quot;wb&quot;</span>) <span class="hljs-keyword">as</span> f:<br>        f.write(pyc_data)<br><br>    i += <span class="hljs-number">1</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Dump finished!&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>原理就是扫描栈帧，然后将栈帧中存在的f_code (code object)以marshal文件的格式dump出来，然后转化为pyc文件。</p>
+<p>我们将<code>code.py</code>的内容替换成以上内容再次注入：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\dump1.png" alt="dump1" data-caption="dump1" loading="lazy">
+
+<p>查看文件夹，发现多了这几个文件：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\file1.png" alt="file1" data-caption="file1" loading="lazy">
+
+<p>marshal文件是用于存储Python对象的序列化表示的文件。可以从marshal文件得到pyc文件。</p>
+<p><code>file0.pyc</code> 是我们 <code>code.py</code> 对应的pyc，我们忽略它，</p>
+<p>用pycdc反编译一下<code>file1.pyc</code>：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\pyc1.png" alt="pycdc" data-caption="pycdc" loading="lazy">
+
+<p>可以看到反编译出的正是我们的<code>test.py</code>。</p>
+<h3 id="注入利用"><a href="#注入利用" class="headerlink" title="注入利用"></a>注入利用</h3><p>在遇到一些难以解包的exe或者解包后难以正常反编译pyc时，我们可以通过注入PVM的方式得到代码逻辑，或者对其中的一些函数进行调用，观察输出等。</p>
+<h2 id="关于py打包成exe"><a href="#关于py打包成exe" class="headerlink" title="关于py打包成exe"></a>关于py打包成exe</h2><p>打包器就是把py编译成pyc，然后连带一些模块和Python虚拟机一起塞进一个exe中。</p>
+<p>现在主流的打包方式都是pyinstaller，但是这种打包器已经有了专门的解包器pyinstextractor，</p>
+<p>虽然pyinstaller内置有AES的文件加密功能，但是因为pyinstaller是开源的，在运行前一定有对加密文件的解密过程，而密钥和解密流程都在打包的exe中，解包可以得到，所以只起到了一个“威慑作用”，因此，pyinstaller在6.0版本删除了–key参数：<a target="_blank" rel="noopener" href="https://github.com/pyinstaller/pyinstaller/pull/6999">Remove the –key&#x2F;cipher bytecode encryption.</a></p>
+<p>其次还有CX_freeze和py2exe两种打包器，但是这两种打包出的exe甚至都不需要解包器，</p>
+<p>CX_freeze：打包后的文件中就有pyc</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\mainmain.png" alt="mainmain" data-caption="mainmain" loading="lazy">
+
+<p>py2exe：直接解压exe</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="E:\Pinguw's Blog\source\_posts\Reverse\KCTF2024-4\py2exe.png" alt="py2exe" data-caption="py2exe" loading="lazy">
+
+<p>以上三种打包器都可十分容易地解包，PVM注入的优势并不是很明显</p>
+<p>但是我发现另一种nuitka打包器，这个打包器是将py代码转化为c代码然后编译，所以理论上是不存在Python字节码的，也就没法解包，这时候利用PVM注入，我们就可以得到一些敏感数据和函数的信息。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://hackerl.github.io/2021/02/12/Python%E8%BF%9B%E7%A8%8B%E6%B3%A8%E5%85%A5/">Python进程注入 | Hello World</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.doctor3.net/?p=104">blog.doctor3.net&#x2F;?p&#x3D;104</a></p>
+
+    <p><img src="https://s2.loli.net/2024/04/14/jbJvEX1hxiCz7OR.jpg" loading="eager"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>Author：</strong>Pinguw<br>
+        <strong>Link：</strong><a href="https://pinguw.github.io/2024/09/14/Reverse/KCTF2024-4/" title="https:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;09&#x2F;14&#x2F;Reverse&#x2F;KCTF2024-4&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;pinguw.github.io&#x2F;2024&#x2F;09&#x2F;14&#x2F;Reverse&#x2F;KCTF2024-4&#x2F;</a><br>
+        
+            <strong>看完了吗，</strong>再去看看<a href="https://pinguw.github.io/" target="_blank">博主的其他文章</a>叭:)
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/Re%E5%88%86%E4%BA%AB/" rel="tag">Re分享</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/WriteUp/" rel="tag">WriteUp</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1726313930241"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#KCTF2024%E7%AC%AC%E5%9B%9B%E9%A2%98-%E7%A5%9E%E7%A7%98%E4%BF%A1%E5%8F%B7"><span class="toc-number">1.</span> <span class="toc-text">KCTF2024第四题-神秘信号</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#PVM%E6%B3%A8%E5%85%A5"><span class="toc-number">2.</span> <span class="toc-text">PVM注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="toc-number">2.1.</span> <span class="toc-text">前置知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFPVM%E6%B3%A8%E5%85%A5"><span class="toc-number">2.2.</span> <span class="toc-text">什么是PVM注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86"><span class="toc-number">2.2.1.</span> <span class="toc-text">注入原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E5%85%A5%E7%A4%BA%E4%BE%8B"><span class="toc-number">2.2.2.</span> <span class="toc-text">注入示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pyc%E5%AD%97%E8%8A%82%E7%A0%81dump"><span class="toc-number">2.2.3.</span> <span class="toc-text">pyc字节码dump</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E5%85%A5%E5%88%A9%E7%94%A8"><span class="toc-number">2.2.4.</span> <span class="toc-text">注入利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8Epy%E6%89%93%E5%8C%85%E6%88%90exe"><span class="toc-number">2.3.</span> <span class="toc-text">关于py打包成exe</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-number">2.4.</span> <span class="toc-text">参考链接</span></a></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="Search" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
