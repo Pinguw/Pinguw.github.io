@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en"><head>
+<title>使用LLVM编写简单混淆Pass（一） - Pinguw&#39;s Blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" type="image/png" />
+<meta name="description" content="LLVMLLVM 简介简单来说，LLVM 是一个现代化的、模块化的编译器后端架构。 传统的编译器通常是“端到端”的（针对某种语言开发，直接生成某种机器码）。而 LLVM 将编译过程拆解为三个独立的部分：  前端 (Frontend)：将源代码（如 C++, Rust）翻译成一种通用的“中间语言” —— LLVM IR。 中端 (Optimizer)：对 LLVM IR 进行各种数学上的优化（比如代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用LLVM编写简单混淆Pass（一）">
+<meta property="og:url" content="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Pinguw&#39;s Blog">
+<meta property="og:description" content="LLVMLLVM 简介简单来说，LLVM 是一个现代化的、模块化的编译器后端架构。 传统的编译器通常是“端到端”的（针对某种语言开发，直接生成某种机器码）。而 LLVM 将编译过程拆解为三个独立的部分：  前端 (Frontend)：将源代码（如 C++, Rust）翻译成一种通用的“中间语言” —— LLVM IR。 中端 (Optimizer)：对 LLVM IR 进行各种数学上的优化（比如代">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/llvm.png">
+<meta property="og:image" content="https://ctf-wiki.org/reverse/obfuscate/images/before-flattening.png">
+<meta property="og:image" content="https://ctf-wiki.org/reverse/obfuscate/images/after-flattenning.png">
+<meta property="og:image" content="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/nofla.png">
+<meta property="og:image" content="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/nofla2.png">
+<meta property="og:image" content="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/fla.png">
+<meta property="og:image" content="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/fla2.png">
+<meta property="article:published_time" content="2026-02-22T08:46:10.000Z">
+<meta property="article:modified_time" content="2026-02-22T12:28:33.193Z">
+<meta property="article:author" content="Pinguw">
+<meta property="article:tag" content="Re分享">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/llvm.png">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1771763355260">
+
+<link rel="stylesheet" href="/css/style.css?v=1771763355260">
+
+
+
+
+    
+        <link rel="stylesheet" href="/custom.css?v=1771763355260">
+    
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/lib/lax.min.js" async></script>
+
+
+<script async src="/js/app.js?v=1771763355260"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script> 
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.1.1"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(https://s2.loli.net/2024/04/14/EJTHkjYwI4dil9K.jpg)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="Pinguw"><img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="Pinguw">
+            <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw" alt="Pinguw">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>12</div>
+        <div><span>Tags</span>4</div>
+        <div><span>Categories</span>3</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archives.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/friends.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/donate.html" title="给我赞助">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                给我赞助
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/aboutme.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://space.bilibili.com/416333261"
+			target="_blank"
+			mdui-tooltip="{content: '哔哩哔哩'}"
+			style="
+				color: rgb(231, 106, 141);
+				background-color: rgba(231, 106, 141, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-bilibili"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/Pinguw"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/Reverse/">Reverse</a>
+          <span class="category-list-count">7</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/比赛WP/">比赛WP</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/随笔/">随笔</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Re%E5%88%86%E4%BA%AB/" style="font-size: 20px;">Re分享</a> <a href="/tags/WriteUp/" style="font-size: 16.67px;">WriteUp</a> <a href="/tags/%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" style="font-size: 13.33px;">刷题记录</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 10px;">随笔</a>
+    </div>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/">2026</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/">2025</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/">2024</a><span class="archive-list-count">10</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Recent Posts</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/">使用LLVM编写简单混淆Pass（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2025/02/01/%E9%9A%8F%E7%AC%94/weihai/">威海冬天</a>
+          </li>
+        
+          <li>
+            <a href="/2024/09/14/Reverse/KCTF2024-4/">KCTF2024第四题-神秘信号 &amp; PVM注入</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/14/Reverse/IDA/">IDA使用入门</a>
+          </li>
+        
+          <li>
+            <a href="/2024/07/10/Reverse/Heaven-Gate/">敲响天堂之门</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+            <li>
+                <a href="https://Pinguw.github.io/" target="_blank" >
+                    <img src="https://s2.loli.net/2024/04/14/UC5zm7fti2ZwkGV.jpg" alt="Pinguw"></img>
+                    <p>Pinguw</p>
+                </a>
+            </li>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2026 Pinguw
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 54.285714285714285%;"> 
+            <img src="https://s2.loli.net/2024/04/10/KE6L8n5Jzu9kWFT.jpg" alt="使用LLVM编写简单混淆Pass（一）" loading="lazy">
+            <h1>使用LLVM编写简单混淆Pass（一）</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2026年02月22日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/Reverse/">Reverse</a>
+        
+        
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h1 id="LLVM"><a href="#LLVM" class="headerlink" title="LLVM"></a>LLVM</h1><h2 id="LLVM-简介"><a href="#LLVM-简介" class="headerlink" title="LLVM 简介"></a>LLVM 简介</h2><p>简单来说，LLVM 是一个现代化的、模块化的编译器后端架构。</p>
+<p>传统的编译器通常是“端到端”的（针对某种语言开发，直接生成某种机器码）。而 LLVM 将编译过程拆解为三个独立的部分：</p>
+<ul>
+<li>前端 (Frontend)：将源代码（如 C++, Rust）翻译成一种通用的“中间语言” —— LLVM IR。</li>
+<li>中端 (Optimizer)：对 LLVM IR 进行各种数学上的优化（比如代码混淆、死代码消除等）。由于 IR 是通用的，这一步的优化逻辑对所有语言都有效。</li>
+<li>后端 (Backend**)**：将优化后的 IR 翻译成特定 CPU 指令（如 x86, ARM, RISC-V）。</li>
+</ul>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./使用LLVM编写简单混淆Pass（一）/llvm.png" alt="llvm" data-caption="llvm" loading="lazy">
+
+<blockquote>
+<p>LLVM的核心目标是提供一套可移植、模块化、可扩展的编译工具链，它能够支持多种硬件架构并进行代码优化。</p>
+</blockquote>
+<h2 id="LLVM-Pass"><a href="#LLVM-Pass" class="headerlink" title="LLVM Pass"></a>LLVM Pass</h2><p>LLVM 的 Pass 有中端 Pass（IR Pass）和后端 Pass（Machine Pass）两种</p>
+<ul>
+<li><p>中端是 LLVM 最引以为傲的部分，它处理的是 <strong>LLVM IR</strong>，是硬件无关的优化；</p>
+</li>
+<li><p>后端的工作是将通用的 IR 转化为具体的机器码，从 IR 逐渐变为 <strong>SelectionDAG</strong>，最后变为 <strong>MachineInstr (MI)</strong></p>
+</li>
+</ul>
+<p>LLVM IR Pass 允许针对代码的不同层级编写 Pass，常见的有：</p>
+<ul>
+<li>ModulePass：观察整个文件（全局变量、所有函数）。</li>
+<li>FunctionPass：一次只处理一个函数。这是最常用的，因为大多数优化都是在函数内部进行的。</li>
+<li>BasicBlockPass：只处理一个基本块（一串没有跳转的指令）。</li>
+<li>LoopPass：专门针对循环结构进行优化。</li>
+</ul>
+<p>本篇的混淆就是实现的 IR Pass 中的 FunctionPass 。</p>
+<h1 id="控制流平坦化"><a href="#控制流平坦化" class="headerlink" title="控制流平坦化"></a>控制流平坦化</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>FLA 是现在非常常见的一种混淆手段了，通过打乱基本块之间的逻辑顺序从而模糊程序的执行逻辑，使得静态分析难度提高。</p>
+<p>具体的原理讲解现在网上有很多文章，基本就是下面两图</p>
+<p>混淆前：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="https://ctf-wiki.org/reverse/obfuscate/images/before-flattening.png" alt="before-flattening" data-caption="before-flattening" loading="lazy">
+
+<p>混淆后：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="https://ctf-wiki.org/reverse/obfuscate/images/after-flattenning.png" alt="after-flattenning" data-caption="after-flattenning" loading="lazy">
+
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><blockquote>
+<p>LLVM 版本：12.0.1</p>
+</blockquote>
+<p>思路就是遍历并收集函数中所有原始的基本块，把它们存入一个列表，然后创建一个 <code>switch</code> 指令。根据<strong>状态变量</strong>的值，决定程序下一步跳转到哪一个原始基本块。</p>
+<h3 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h3><p>由于编写的 Pass 是 IR 层的，首先要处理一些特殊指令，比如异常处理：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">if</span> (<span class="hljs-built_in">isa</span>&lt;InvokeInst&gt;(&amp;I) || <span class="hljs-built_in">isa</span>&lt;LandingPadInst&gt;(&amp;I)) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br></code></pre></td></tr></table></figure>
+
+<p>这样可以跳过 <code>Invoke</code> 和 <code>LandingPad</code> 这一对指令。</p>
+<p>我们支持的大概有这些基本的跳转指令：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">isa</span>&lt;ReturnInst&gt;(i)<br><span class="hljs-built_in">isa</span>&lt;ResumeInst&gt;(i)<br><span class="hljs-built_in">isa</span>&lt;UnreachableInst&gt;(i)<br><span class="hljs-built_in">isa</span>&lt;BranchInst&gt;(i)<br><span class="hljs-built_in">isa</span>&lt;SwitchInst&gt;(i)<br><span class="hljs-built_in">isa</span>&lt;IndirectBrInst&gt;(i)<br></code></pre></td></tr></table></figure>
+
+<p>后来发现 IR 中含有大量 PHI 节点，</p>
+<p>PHI 节点会出现在基本块的开头，会根据上一个基本块来源于哪一个基本块决定对应的值，形如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs assembly">entry:<br>  br i1 %condition, label %if.then, label %if.else<br><br>if.then:<br>  br label %merge<br><br>if.else:<br>  br label %merge<br><br>merge:<br>  ; 如果从 if.then 过来，%result 就是 1<br>  ; 如果从 if.else 过来，%result 就是 2<br>  %result = phi i32 [ 1, %if.then ], [ 2, %if.else ]<br>  ret i32 %result+<br></code></pre></td></tr></table></figure>
+
+<p>需要把它转成一般汇编，思路是在前一个基本块结尾存储一个值，不同的来源存储的值不同，然后在 PHI 节点处把这个值取出来即可。</p>
+<p>首先收集 PHI 节点：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">for</span> (Instruction &amp;I : BB) &#123;<br>	<span class="hljs-keyword">if</span> (PHINode* PN = <span class="hljs-built_in">dyn_cast</span>&lt;PHINode&gt;(&amp;I)) phis.<span class="hljs-built_in">push_back</span>(PN);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>寻找合适的插入点：第一条非 PHI 指令：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++">Instruction* loadInsert = <span class="hljs-literal">nullptr</span>;<br><span class="hljs-keyword">for</span> (Instruction &amp;I : BB) &#123;<br>	<span class="hljs-keyword">if</span> (!<span class="hljs-built_in">isa</span>&lt;PHINode&gt;(&amp;I)) &#123; loadInsert = &amp;I; <span class="hljs-keyword">break</span>; &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>遍历所有 PHI 指令，</p>
+<p>根据来源块编写 <code>store</code> 指令：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">for</span> (<span class="hljs-type">unsigned</span> i = <span class="hljs-number">0</span>; i &lt; PhiNode-&gt;<span class="hljs-built_in">getNumIncomingValues</span>(); ++i) &#123;<br>	Value* inV = PhiNode-&gt;<span class="hljs-built_in">getIncomingValue</span>(i);<br>	BasicBlock* pred = PhiNode-&gt;<span class="hljs-built_in">getIncomingBlock</span>(i);<br>	Instruction* predTerm = pred-&gt;<span class="hljs-built_in">getTerminator</span>();<br>	IRBuilder&lt;&gt; <span class="hljs-built_in">pb</span>(predTerm);<br>	pb.<span class="hljs-built_in">CreateStore</span>(inV, slot);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后收集所有使用该 PHI 的指令，并在它们的块中插入 <code>load</code> ：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> &amp;kv : usesPerBlock) &#123;<br>	BasicBlock* useBB = kv.first;<br>	std::vector&lt;Instruction*&gt;&amp; usersInBB = kv.second;<br><br>	Instruction* insertPt = <span class="hljs-literal">nullptr</span>;<br>	<span class="hljs-keyword">for</span> (Instruction &amp;I : *useBB) &#123;<br>		<span class="hljs-keyword">if</span> (!<span class="hljs-built_in">isa</span>&lt;PHINode&gt;(&amp;I)) &#123; insertPt = &amp;I; <span class="hljs-keyword">break</span>; &#125;<br>	&#125;<br>	<span class="hljs-keyword">if</span> (!insertPt) insertPt = useBB-&gt;<span class="hljs-built_in">getTerminator</span>();<br><br>	IRBuilder&lt;&gt; <span class="hljs-built_in">lb</span>(insertPt);<br>	LoadInst* L = lb.<span class="hljs-built_in">CreateLoad</span>(Ty, slot, PhiNode-&gt;<span class="hljs-built_in">getName</span>() + <span class="hljs-string">&quot;.phi.load&quot;</span>);<br><br>	<span class="hljs-keyword">for</span> (Instruction* UInst : usersInBB) &#123;<br>		UInst-&gt;<span class="hljs-built_in">replaceUsesOfWith</span>(PhiNode, L);<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="收集基本块"><a href="#收集基本块" class="headerlink" title="收集基本块"></a>收集基本块</h3><p>这里没什么好说的，收集除了入口块的所有基本块</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">ControlFlowFlatten::collectOrigBlocks</span><span class="hljs-params">(Function &amp;F, std::vector&lt;BasicBlock*&gt;&amp; out)</span> </span>&#123;<br>    out.<span class="hljs-built_in">clear</span>();<br>    out.<span class="hljs-built_in">reserve</span>(std::<span class="hljs-built_in">distance</span>(F.<span class="hljs-built_in">begin</span>(), F.<span class="hljs-built_in">end</span>()));<br>    <span class="hljs-keyword">for</span> (BasicBlock &amp;BB : F) &#123;<br>        <span class="hljs-keyword">if</span> (&amp;BB == &amp;F.<span class="hljs-built_in">getEntryBlock</span>()) <span class="hljs-keyword">continue</span>;<br>        out.<span class="hljs-built_in">push_back</span>(&amp;BB);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="创建分发块"><a href="#创建分发块" class="headerlink" title="创建分发块"></a>创建分发块</h3><p>首先构建一个 <code>switch</code> 结构，检查 <code>loadState</code> 的值，并跳转到对应的基本块：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">BasicBlock* defaultTarget = origBlocks.<span class="hljs-built_in">empty</span>() ? &amp;F.<span class="hljs-built_in">getEntryBlock</span>() : origBlocks[<span class="hljs-number">0</span>];<br>SwitchInst* swi = disBuilder.<span class="hljs-built_in">CreateSwitch</span>(loadState, defaultTarget, origBlocks.<span class="hljs-built_in">size</span>());<br></code></pre></td></tr></table></figure>
+
+<p>然后遍历所有原始代码块，将它们的<strong>状态 ID</strong> 和对应的<strong>基本块地址</strong>填入 <code>switch</code> 的路由表里：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">for</span> (BasicBlock* BB : origBlocks) &#123;<br>	<span class="hljs-type">uint64_t</span> sid = stateOf.<span class="hljs-built_in">at</span>(BB);<br>	Constant* caseValConst = ConstantInt::<span class="hljs-built_in">get</span>(i32Ty, <span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">uint64_t</span>&gt;(sid) &amp; <span class="hljs-number">0xFFFFFFFF</span>);<br>	ConstantInt* caseVal = <span class="hljs-built_in">cast</span>&lt;ConstantInt&gt;(caseValConst);<br>	swi-&gt;<span class="hljs-built_in">addCase</span>(caseVal, BB);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>关于 <code>loadState</code> 的值可以存储在全局变量或者栈上，我选择掺在代码段中，以达到更高的混淆程度。</p>
+<h3 id="创建中转块"><a href="#创建中转块" class="headerlink" title="创建中转块"></a>创建中转块</h3><p>设法存储分发块使用的 <code>loadState</code> 的值，并跳转回分发块，执行下一次分发。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">irb.<span class="hljs-built_in">CreateCall</span>(jmpAsm, &#123; dispatchAddrInt &#125;);<br></code></pre></td></tr></table></figure>
+
+<p>我使用的方法是将基本块 ID 插入到正常 opcode 中，然后通过 <code>call $+5</code> 将 ID 压进栈，并打乱正常栈帧，破坏 IDA 的反编译</p>
+<p>类似于：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs assembly">call $+5<br>$stateValAddr ; 被压进栈，在 dispatcher 中被取出然后使用<br><br>jmp dispatchBB ; 跳转到 dispatcher<br></code></pre></td></tr></table></figure>
+
+<h3 id="修改跳转指令"><a href="#修改跳转指令" class="headerlink" title="修改跳转指令"></a>修改跳转指令</h3><p>简单来说就是把 <code>A -&gt; B</code> 改造成了 <code>A -&gt; 中转块(设置状态为B) -&gt; 分发器 -&gt; B</code> 。</p>
+<p>遍历所有基本块的结束语句，如果是函数结束（<code>return</code>）就正常结束，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-built_in">isa</span>&lt;ReturnInst&gt;(term) || <span class="hljs-built_in">isa</span>&lt;ResumeInst&gt;(term)<br></code></pre></td></tr></table></figure>
+
+<p>然后分别对 <code>BranchInst</code> ，<code>SwitchInst</code> ，<code>IndirectBrInst</code> 等进行处理，都是把  <code>-&gt; B</code>  改写成 <code>-&gt; setB</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C++">BasicBlock* setBlk = <span class="hljs-built_in">getOrCreateSetStateBlock</span>(succState);<br></code></pre></td></tr></table></figure>
+
+<h3 id="打乱基本块顺序"><a href="#打乱基本块顺序" class="headerlink" title="打乱基本块顺序"></a>打乱基本块顺序</h3><p>这里也比较容易实现，使用随机数打乱即可。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs C++">std::<span class="hljs-built_in">shuffle</span>(reorder.<span class="hljs-built_in">begin</span>(), reorder.<span class="hljs-built_in">end</span>(), RNG);<br></code></pre></td></tr></table></figure>
+
+<h3 id="修复问题"><a href="#修复问题" class="headerlink" title="修复问题"></a>修复问题</h3><p>主要逻辑已经完善了，但是无法通过 LLVM IR 的 SSA 验证，因为<strong>代码块被打乱，在编译器看来变量可能未被定义就已经被使用</strong></p>
+<p>解决方案是把所有的<strong>寄存器变量</strong>降级为<strong>内存访问</strong>。因为栈是持久的，不受控制流打乱的影响。</p>
+<p>先筛选所有受到影响的指令，标准为</p>
+<ul>
+<li>跨块使用：在 <code>Block A</code> 中定义，但在其他块（<code>Block B</code>, <code>Block C</code>…）中被引用；</li>
+<li>不是特殊指令：排除 PHI、Alloca、终结符等有自己处理逻辑的指令；</li>
+<li>无副作用：确保转换不会改变代码原有的运行结果。</li>
+</ul>
+<p>对于每一个需要修复的指令 <code>I</code>，在函数的入口块（Entry）创建一个 <code>alloca</code> 指令，在此处存入数据</p>
+<p>最后在该变量被引用的地方按需加载。</p>
+<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><p>混淆前：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./使用LLVM编写简单混淆Pass（一）/nofla.png" alt="nofla" data-caption="nofla" loading="lazy">
+
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./使用LLVM编写简单混淆Pass（一）/nofla2.png" alt="nofla graph" data-caption="nofla graph" loading="lazy">
+
+<p>混淆后：</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./使用LLVM编写简单混淆Pass（一）/fla.png" alt="fla" data-caption="fla" loading="lazy">
+
+<p>反编译受到插入代码段的数据的影响未成功，并且流程图已经被破坏，没有收敛</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./使用LLVM编写简单混淆Pass（一）/fla2.png" alt="fla graph" data-caption="fla graph" loading="lazy">
+
+<h2 id="待改进"><a href="#待改进" class="headerlink" title="待改进"></a>待改进</h2><ul>
+<li>每个基本块 ID 固定不变且按自然数排列</li>
+<li>只有一个主分发器，缺失子分发器</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://1ens.github.io/2024/11/29/LLVM%E5%85%A5%E9%97%A8/">https://1ens.github.io/2024/11/29/LLVM%E5%85%A5%E9%97%A8/</a></p>
+<p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-288667.htm">https://bbs.kanxue.com/thread-288667.htm</a></p>
+<p><a target="_blank" rel="noopener" href="https://ctf-wiki.org/reverse/obfuscate/control-flow-flatten/">https://ctf-wiki.org/reverse/obfuscate/control-flow-flatten/</a></p>
+
+    <p><img src="https://s2.loli.net/2024/04/14/jbJvEX1hxiCz7OR.jpg" loading="eager"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>Author：</strong>Pinguw<br>
+        <strong>Link：</strong><a href="https://pinguw.github.io/2026/02/22/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89/" title="https:&#x2F;&#x2F;pinguw.github.io&#x2F;2026&#x2F;02&#x2F;22&#x2F;Reverse&#x2F;%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;pinguw.github.io&#x2F;2026&#x2F;02&#x2F;22&#x2F;Reverse&#x2F;%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%B8%80%EF%BC%89&#x2F;</a><br>
+        
+            <strong>看完了吗，</strong>再去看看<a href="https://pinguw.github.io/" target="_blank">博主的其他文章</a>叭:)
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/Re%E5%88%86%E4%BA%AB/" rel="tag">Re分享</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1771763355229"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#LLVM"><span class="toc-number">1.</span> <span class="toc-text">LLVM</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#LLVM-%E7%AE%80%E4%BB%8B"><span class="toc-number">1.1.</span> <span class="toc-text">LLVM 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LLVM-Pass"><span class="toc-number">1.2.</span> <span class="toc-text">LLVM Pass</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E6%B5%81%E5%B9%B3%E5%9D%A6%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">控制流平坦化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-number">2.1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.2.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="toc-number">2.2.1.</span> <span class="toc-text">预处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E9%9B%86%E5%9F%BA%E6%9C%AC%E5%9D%97"><span class="toc-number">2.2.2.</span> <span class="toc-text">收集基本块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%88%86%E5%8F%91%E5%9D%97"><span class="toc-number">2.2.3.</span> <span class="toc-text">创建分发块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%AD%E8%BD%AC%E5%9D%97"><span class="toc-number">2.2.4.</span> <span class="toc-text">创建中转块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E8%B7%B3%E8%BD%AC%E6%8C%87%E4%BB%A4"><span class="toc-number">2.2.5.</span> <span class="toc-text">修改跳转指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%93%E4%B9%B1%E5%9F%BA%E6%9C%AC%E5%9D%97%E9%A1%BA%E5%BA%8F"><span class="toc-number">2.2.6.</span> <span class="toc-text">打乱基本块顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E5%A4%8D%E9%97%AE%E9%A2%98"><span class="toc-number">2.2.7.</span> <span class="toc-text">修复问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%88%E6%9E%9C"><span class="toc-number">2.3.</span> <span class="toc-text">效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%85%E6%94%B9%E8%BF%9B"><span class="toc-number">2.4.</span> <span class="toc-text">待改进</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="Search" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
