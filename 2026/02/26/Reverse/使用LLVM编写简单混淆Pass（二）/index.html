@@ -15,7 +15,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://pinguw.github.io/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/obf.png">
 <meta property="article:published_time" content="2026-02-26T07:37:29.000Z">
-<meta property="article:modified_time" content="2026-03-06T02:37:42.792Z">
+<meta property="article:modified_time" content="2026-03-06T02:43:58.914Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="Re分享">
 <meta name="twitter:card" content="summary">
@@ -25,15 +25,15 @@
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1772764690216">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1772765042902">
 
-<link rel="stylesheet" href="/css/style.css?v=1772764690216">
+<link rel="stylesheet" href="/css/style.css?v=1772765042902">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1772764690216">
+        <link rel="stylesheet" href="/custom.css?v=1772765042902">
     
 
 
@@ -43,7 +43,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1772764690216"></script>
+<script async src="/js/app.js?v=1772765042902"></script>
 
  
 
@@ -318,7 +318,7 @@
     <p>上次使用 LLVM Pass 实现了控制流平坦化混淆，这次实现的是<strong>间接跳转（Indirect Call）</strong>。</p>
 <h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>效果：主要是起到了一个静态混淆的作用，打断了函数之间的调用链，无法通过交叉引用定位敏感函数，也不能直接看出某处调用的函数是哪个。</p>
 <p>基本想法是把所有的正常 <code>call</code> 和 <code>jmp</code> 都改成<strong>先获取一个加密的地址，再通过运算解密这个地址，最后跳转到解密的地址去</strong>。</p>
-<p>那么需要定义一个全局数组存储加密后的地址，由于一次一密，还需要一个存储密钥的全局数组。</p>
+<p>那么需要定义一个全局数组存储加密后的地址。</p>
 <h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="收集跳转指令"><a href="#收集跳转指令" class="headerlink" title="收集跳转指令"></a>收集跳转指令</h2><h3 id="针对-CallInst"><a href="#针对-CallInst" class="headerlink" title="针对 CallInst"></a>针对 <code>CallInst</code></h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">auto</span> *call = <span class="hljs-built_in">dyn_cast</span>&lt;CallInst&gt;(&amp;I)<br></code></pre></td></tr></table></figure>
 
 <p>分配索引：</p>
@@ -392,7 +392,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1772764690182"></script>
+    <script async src="/js/copy-codeblock.js?v=1772765042884"></script>
   
 
   
