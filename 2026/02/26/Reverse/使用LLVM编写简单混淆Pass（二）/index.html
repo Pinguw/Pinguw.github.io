@@ -13,27 +13,28 @@
 <meta property="og:site_name" content="Pinguw&#39;s Blog">
 <meta property="og:description" content="上次使用 LLVM Pass 实现了控制流平坦化混淆，这次实现的是间接跳转（Indirect Call）。 原理效果：主要是起到了一个静态混淆的作用，打断了函数之间的调用链，无法通过交叉引用定位敏感函数，也不能直接看出某处调用的函数是哪个。 基本想法是把所有的正常 call 和 jmp 都改成先获取一个加密的地址，再通过运算解密这个地址，最后跳转到解密的地址去。 那么需要定义一个全局数组存储加密后">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://pinguw.github.io/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/obf.png">
+<meta property="og:image" content="https://pinguw.github.io/2026/02/26/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/noobf.png">
+<meta property="og:image" content="https://pinguw.github.io/2026/02/26/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/obf.png">
 <meta property="article:published_time" content="2026-02-26T07:37:29.000Z">
-<meta property="article:modified_time" content="2026-03-06T02:43:58.914Z">
+<meta property="article:modified_time" content="2026-03-06T02:47:21.063Z">
 <meta property="article:author" content="Pinguw">
 <meta property="article:tag" content="Re分享">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pinguw.github.io/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/obf.png">
+<meta name="twitter:image" content="https://pinguw.github.io/2026/02/26/Reverse/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/noobf.png">
 
 <link rel="stylesheet" href="/lib/fancybox/fancybox.css">
 <link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
 
 
-<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1772765139138">
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1772765245713">
 
-<link rel="stylesheet" href="/css/style.css?v=1772765139138">
+<link rel="stylesheet" href="/css/style.css?v=1772765245713">
 
 
 
 
     
-        <link rel="stylesheet" href="/custom.css?v=1772765139138">
+        <link rel="stylesheet" href="/custom.css?v=1772765245713">
     
 
 
@@ -43,7 +44,7 @@
 <script src="/lib/lax.min.js" async></script>
 
 
-<script async src="/js/app.js?v=1772765139138"></script>
+<script async src="/js/app.js?v=1772765245713"></script>
 
  
 
@@ -333,19 +334,19 @@
 
 <p>然后修改原始 <code>BranchInst</code> 指令。</p>
 <h2 id="初始化跳转表"><a href="#初始化跳转表" class="headerlink" title="初始化跳转表"></a>初始化跳转表</h2><p>创建一个 LLVM 数组类型用来存储<strong>跳转地址</strong>表，每次调用先判断是否定义，如果是则直接返回该数组，否则定义：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span>* GV = M-&gt;<span class="hljs-built_in">getGlobalVariable</span>(<span class="hljs-string">&quot;bb_jump_table&quot;</span>))<br>	<span class="hljs-keyword">return</span> GV;<br><br>ArrayType* arrType = ArrayType::<span class="hljs-built_in">get</span>(intTy, maxEntries);<br><span class="hljs-keyword">auto</span>* table = <span class="hljs-keyword">new</span> <span class="hljs-built_in">GlobalVariable</span>(<br>	*M,<br>	arrType,<br>	<span class="hljs-literal">false</span>,<br>	GlobalValue::PrivateLinkage,<br>	ConstantAggregateZero::<span class="hljs-built_in">get</span>(arrType),<br>	<span class="hljs-string">&quot;bb_jump_table&quot;</span><br>);<br><span class="hljs-keyword">return</span> table;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">if</span> (<span class="hljs-keyword">auto</span>* GV = M-&gt;<span class="hljs-built_in">getGlobalVariable</span>(<span class="hljs-string">&quot;bb_jump_table&quot;</span>))<br>    <span class="hljs-keyword">return</span> GV;<br><br>ArrayType* arrType = ArrayType::<span class="hljs-built_in">get</span>(intTy, maxEntries);<br><span class="hljs-keyword">auto</span>* table = <span class="hljs-keyword">new</span> <span class="hljs-built_in">GlobalVariable</span>(<br>    *M,<br>    arrType,<br>    <span class="hljs-literal">false</span>,<br>    GlobalValue::PrivateLinkage,<br>    ConstantAggregateZero::<span class="hljs-built_in">get</span>(arrType),<br>    <span class="hljs-string">&quot;bb_jump_table&quot;</span><br>);<br><span class="hljs-keyword">return</span> table;<br></code></pre></td></tr></table></figure>
 
 <p>对<strong>跳转索引</strong>表做同样操作。</p>
 <h2 id="设计间接跳转指令"><a href="#设计间接跳转指令" class="headerlink" title="设计间接跳转指令"></a>设计间接跳转指令</h2><p>把原地址加密一下，再存到地址表中，然后在 call 或 jmp 前从表中取出数据，还原地址，然后跳转。</p>
 <p>加密逻辑使用加减，计算加密地址：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">uint64_t</span> mask = <span class="hljs-number">0x200000</span> + (((<span class="hljs-type">uint64_t</span>)std::<span class="hljs-built_in">rand</span>() &lt;&lt; <span class="hljs-number">32</span>) | std::<span class="hljs-built_in">rand</span>()) % <span class="hljs-number">0x200000</span>;<br><span class="hljs-keyword">switch</span> (rand_num) &#123;<br>	<span class="hljs-keyword">case</span> <span class="hljs-number">0</span>:<br>		encPtrConst = ConstantExpr::<span class="hljs-built_in">getAdd</span>(encPtrConst, ConstantInt::<span class="hljs-built_in">get</span>(ptrValueType, mask));<br>		<span class="hljs-keyword">break</span>;<br>	<span class="hljs-keyword">case</span> <span class="hljs-number">1</span>;<br>		encPtrConst = ConstantExpr::<span class="hljs-built_in">getSub</span>(encPtrConst, ConstantInt::<span class="hljs-built_in">get</span>(ptrValueType, mask));<br>		<span class="hljs-keyword">break</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">uint64_t</span> mask = <span class="hljs-number">0x200000</span> + (((<span class="hljs-type">uint64_t</span>)std::<span class="hljs-built_in">rand</span>() &lt;&lt; <span class="hljs-number">32</span>) | std::<span class="hljs-built_in">rand</span>()) % <span class="hljs-number">0x200000</span>;<br><span class="hljs-keyword">switch</span> (rand_num) &#123;<br>    <span class="hljs-keyword">case</span> <span class="hljs-number">0</span>:<br>        encPtrConst = ConstantExpr::<span class="hljs-built_in">getAdd</span>(encPtrConst, ConstantInt::<span class="hljs-built_in">get</span>(ptrValueType, mask));<br>        <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-number">1</span>;<br>        encPtrConst = ConstantExpr::<span class="hljs-built_in">getSub</span>(encPtrConst, ConstantInt::<span class="hljs-built_in">get</span>(ptrValueType, mask));<br>        <span class="hljs-keyword">break</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>解密与加密相反即可。</p>
 <h2 id="替换原指令"><a href="#替换原指令" class="headerlink" title="替换原指令"></a>替换原指令</h2><h3 id="针对-CallInst-1"><a href="#针对-CallInst-1" class="headerlink" title="针对 CallInst"></a>针对 <code>CallInst</code></h3><p>获取对应的 idx 后，从表中取出地址，生成指令：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++">Value* runtimeIdx = irb.<span class="hljs-built_in">CreateLoad</span>(idxPtr); <span class="hljs-comment">// mov r1, IdxArray[idx]</span><br>Value* gep = irb.<span class="hljs-built_in">CreateInBoundsGEP</span>(JumpTable-&gt;<span class="hljs-built_in">getValueType</span>(), JumpTable, &#123;irb.<span class="hljs-built_in">getInt64</span>(<span class="hljs-number">0</span>), runtimeIdx&#125;);<br>Value* encFuncPtr = irb.<span class="hljs-built_in">CreateLoad</span>(ptrValueType, gep); <span class="hljs-comment">// mov r2, JumpTable[r1]</span><br></code></pre></td></tr></table></figure>
 
 <p>最后安装加密的解密方法生成解密指令：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++">Value* realFuncPtr = <span class="hljs-literal">nullptr</span>;<br><span class="hljs-keyword">switch</span> (rand_num) &#123;<br>	<span class="hljs-keyword">case</span> <span class="hljs-number">0</span>:<br>		realFuncPtr = irb.<span class="hljs-built_in">CreateSub</span>(encFuncPtr, irb.<span class="hljs-built_in">getInt64</span>(mask));<br>		<span class="hljs-keyword">break</span>;<br>	<span class="hljs-keyword">case</span> <span class="hljs-number">1</span>:<br>		realFuncPtr = irb.<span class="hljs-built_in">CreateAdd</span>(encFuncPtr, irb.<span class="hljs-built_in">getInt64</span>(mask));<br>		<span class="hljs-keyword">break</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++">Value* realFuncPtr = <span class="hljs-literal">nullptr</span>;<br><span class="hljs-keyword">switch</span> (rand_num) &#123;<br>    <span class="hljs-keyword">case</span> <span class="hljs-number">0</span>:<br>        realFuncPtr = irb.<span class="hljs-built_in">CreateSub</span>(encFuncPtr, irb.<span class="hljs-built_in">getInt64</span>(mask));<br>        <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-number">1</span>:<br>        realFuncPtr = irb.<span class="hljs-built_in">CreateAdd</span>(encFuncPtr, irb.<span class="hljs-built_in">getInt64</span>(mask));<br>        <span class="hljs-keyword">break</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>最后添加 <code>call reg</code> 即可。</p>
 <h3 id="针对-BranchInst-1"><a href="#针对-BranchInst-1" class="headerlink" title="针对 BranchInst"></a>针对 <code>BranchInst</code></h3><p>加解密方式与 <code>call</code> 相同，区别在需要先根据条件选择索引</p>
@@ -355,9 +356,11 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">IndirectBrInst* ind = irb.<span class="hljs-built_in">CreateIndirectBr</span>(targetPtr);<br></code></pre></td></tr></table></figure>
 
 <h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p>混淆前：</p>
-<p>![no obf](.&#x2F;使用LLVM编写简单混淆Pass（二）&#x2F;no obf.png)</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./使用LLVM编写简单混淆Pass（二）/noobf.png" alt="no obf" data-caption="no obf" loading="lazy">
+
 <p>混淆后：</p>
-<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/./%E4%BD%BF%E7%94%A8LLVM%E7%BC%96%E5%86%99%E7%AE%80%E5%8D%95%E6%B7%B7%E6%B7%86Pass%EF%BC%88%E4%BA%8C%EF%BC%89/obf.png" alt="obf" data-caption="obf" loading="lazy"></p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="./使用LLVM编写简单混淆Pass（二）/obf.png" alt="obf" data-caption="obf" loading="lazy">
+
 <h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>待改进的地方有：加密逻辑过于简单，跳转表未加密等</p>
 <p>现在 AI 这么强了，搓个脚本去混淆轻而易举，甚至可能用 mcp 分析的时候顺手就给去掉了。</p>
 <p>目前这种混淆只能放在 CTF 新生赛里面逗逗新生了，现在想要对抗 AI 可能需要一些故意的错误引导，让 AI 的分析也变慢。</p>
@@ -392,7 +395,7 @@
 </div>
   
   
-    <script async src="/js/copy-codeblock.js?v=1772765139120"></script>
+    <script async src="/js/copy-codeblock.js?v=1772765245693"></script>
   
 
   
